@@ -939,7 +939,7 @@ function preencherDashboard(data) {
 
   if (data.avaliacoes) {
     const proximas = safeArray(data.avaliacoes.proximas);
-    const disciplinas = safeArray(data.avaliacoes.disciplinas);
+    const disciplinas = safeArray(data.avaliacoes.historico);
 
     avaliacoes = [...proximas, ...disciplinas];
   }
@@ -1291,36 +1291,23 @@ if (data.avaliacoes) {
 
     avaliacoes = [...proximas, ...historico];
 }
-  const container = document.getElementById("avaliacoes-timeline");
-  if (!container) return;
 
-  if (avaliacoes.length === 0) {
-    container.innerHTML = `<div class="empty-state"><i class="fas fa-clipboard-check"></i><p>Nenhuma avaliação agendada</p></div>`;
-    return;
-  }
-
-
-  const sorted = [...avaliacoes].sort(
-    (a, b) => new Date(a.data) - new Date(b.data),
-  );
-
-  container.innerHTML = sorted
-    .map(
-      (av) => `
-        <div class="timeline-item">
-            <div class="timeline-date">
-                <i class="fas fa-calendar-day"></i> ${formatarData(av.data)} 
-                <span style="margin-left: 12px;"><i class="fas fa-clock"></i> ${av.hora_inicio || "--:--"}</span>
-            </div>
-            <div class="timeline-title">${av.descricao || "Avaliação"}</div>
-            <div class="timeline-desc">
-                <strong>Disciplina:</strong> ${av.componente_curricular || "Não informada"}<br>
-                <strong>Tipo:</strong> ${av.tipo || "Prova"} | <strong>Peso:</strong> ${av.peso || "-"}
-            </div>
+if (avaliacoes.length === 0) {
+    container.innerHTML = `
+        <div class="empty-state">
+            Nenhuma avaliação encontrada
         </div>
-    `,
-    )
-    .join("");
+    `;
+    return;
+}
+
+container.innerHTML = avaliacoes.map(av => `
+    <div class="avaliacao-card">
+        <div class="disciplina">${av.disciplina}</div>
+        <div class="etapa">Etapa ${av.etapa ?? "-"}</div>
+        <div class="nota">${av.nota ?? "-"}</div>
+    </div>
+`).join("");
 }
 
 function formatarData(dataStr) {
