@@ -18,15 +18,14 @@ const verificarToken = (req, res, next) => {
   next();
 };
 
-// DADOS DO ALUNO (dados pessoais fixos)
+// ===============================
+// DADOS DO ALUNO
+// ===============================
 router.get("/me", verificarToken, async (req, res) => {
-  //// ===== ADICIONADO =====
   const cacheKey = `me_${req.token}`;
   const cached = req.cache.get(cacheKey);
-  if (cached) {
-    return res.json(cached);
-  }
-  //// =====================
+
+  if (cached) return res.json(cached);
 
   try {
     const headers = {
@@ -36,13 +35,13 @@ router.get("/me", verificarToken, async (req, res) => {
 
     const alunoRes = await axios.get(
       `${SUAP_BASE_URL}/api/ensino/meus-dados-aluno/`,
-      { headers },
+      { headers }
     );
 
     let pessoalRes;
     try {
       pessoalRes = await axios.get(`${SUAP_BASE_URL}/api/rh/eu/`, { headers });
-    } catch (e) {
+    } catch {
       pessoalRes = { data: {} };
     }
 
@@ -54,9 +53,7 @@ router.get("/me", verificarToken, async (req, res) => {
 
     const response = { aluno: alunoCompleto };
 
-    //// ===== ADICIONADO =====
     req.cache.set(cacheKey, response);
-    //// =====================
 
     res.json(response);
   } catch (err) {
@@ -65,15 +62,14 @@ router.get("/me", verificarToken, async (req, res) => {
   }
 });
 
-// DADOS COMPLETOS POR ANO
+// ===============================
+// DASHBOARD
+// ===============================
 router.get("/dashboard/:ano?", verificarToken, async (req, res) => {
-  //// ===== ADICIONADO =====
   const cacheKey = `dashboard_${req.token}_${req.params.ano || "auto"}`;
   const cached = req.cache.get(cacheKey);
-  if (cached) {
-    return res.json(cached);
-  }
-  //// =====================
+
+  if (cached) return res.json(cached);
 
   try {
     const headers = {
@@ -83,24 +79,27 @@ router.get("/dashboard/:ano?", verificarToken, async (req, res) => {
 
     const periodosRes = await axios.get(
       `${SUAP_BASE_URL}/api/ensino/meus-periodos-letivos/`,
-      { headers },
+      { headers }
     );
 
     const periodos = periodosRes.data?.results || [];
 
     let ano = parseInt(req.params.ano);
+
     if (!ano || isNaN(ano)) {
       ano = Math.max(
         ...periodos.map((p) => p.ano_letivo),
-        new Date().getFullYear(),
+        new Date().getFullYear()
       );
     }
 
     const periodosDoAno = periodos.filter((p) => p.ano_letivo === ano);
+
     const periodoMaisRecente = periodosDoAno[periodosDoAno.length - 1] || {
       ano_letivo: ano,
       periodo_letivo: 1,
     };
+
     const periodo = periodoMaisRecente.periodo_letivo;
 
     const [boletimRes, turmasRes, proximasAvaliacoes] = await Promise.all([
@@ -113,7 +112,7 @@ router.get("/dashboard/:ano?", verificarToken, async (req, res) => {
       axios
         .get(
           `${SUAP_BASE_URL}/api/ensino/minhas-turmas-virtuais/${ano}/${periodo}/`,
-          { headers },
+          { headers }
         )
         .catch(() => ({ data: { results: [] } })),
 
@@ -126,55 +125,47 @@ router.get("/dashboard/:ano?", verificarToken, async (req, res) => {
 
     const disciplinas = boletimRes.data?.results || [];
 
-let avaliacoes = [];
+    // ===============================
+    // HISTÓRICO DE AVALIAÇÕES
+    // ===============================
 
-await Promise.all(
-  disciplinas.map(async (d) => {
-    try {
-      const etapas = await axios.get(
-        `${SUAP_BASE_URL}/api/ensino/disciplinas/${d.codigo_diario}/etapas/`,
-        { headers }
-      );
+    const historicoAvaliacoes = [];
 
-      const etapasLista = etapas.data?.results || [];
+    disciplinas.forEach((d) => {
+      const etapas = [
+        { etapa: 1, nota: d.nota_etapa_1?.nota },
+        { etapa: 2, nota: d.nota_etapa_2?.nota },
+        { etapa: 3, nota: d.nota_etapa_3?.nota },
+        { etapa: 4, nota: d.nota_etapa_4?.nota },
+      ];
 
-      etapasLista.forEach((etapa) => {
-        const avals = etapa.avaliacoes || [];
-
-        avals.forEach((av) => {
-          avaliacoes.push({
+      etapas.forEach((e) => {
+        if (e.nota !== null && e.nota !== undefined) {
+          historicoAvaliacoes.push({
             disciplina: d.disciplina,
-            codigo: d.codigo_diario,
-            etapa: etapa.numero_etapa,
-            tipo: av.tipo,
-            sigla: av.sigla,
-            data: av.data,
-            nota: av.nota
+            codigo_diario: d.codigo_diario,
+            etapa: e.etapa,
+            nota: e.nota,
           });
-        });
+        }
       });
-
-    } catch (e) {
-      console.log("Erro ao buscar etapas:", d.codigo_diario);
-    }
-  })
-);
+    });
 
     const response = {
       anoSelecionado: ano,
       periodoAtual: { ano, periodo },
       periodos: periodosRes.data,
+
       avaliacoes: {
-  proximas: proximasAvaliacoes.data,
-  disciplinas: avaliacoes
-},
+        proximas: proximasAvaliacoes.data?.results || [],
+        historico: historicoAvaliacoes,
+      },
+
       boletim: boletimRes.data,
       turmas: turmasRes.data,
     };
 
-    //// ===== ADICIONADO =====
     req.cache.set(cacheKey, response);
-    //// =====================
 
     res.json(response);
   } catch (err) {
@@ -191,18 +182,18 @@ await Promise.all(
   }
 });
 
+// ===============================
 // BOLETIM ANUAL
+// ===============================
 router.get("/boletim-anual/:ano", verificarToken, async (req, res) => {
-  //// ===== ADICIONADO =====
   const cacheKey = `boletim_${req.token}_${req.params.ano}`;
   const cached = req.cache.get(cacheKey);
-  if (cached) {
-    return res.json(cached);
-  }
-  //// =====================
+
+  if (cached) return res.json(cached);
 
   try {
     const { ano } = req.params;
+
     const headers = {
       Authorization: `Bearer ${req.token}`,
       Accept: "application/json",
@@ -212,6 +203,7 @@ router.get("/boletim-anual/:ano", verificarToken, async (req, res) => {
       axios
         .get(`${SUAP_BASE_URL}/api/ensino/meu-boletim/${ano}/1/`, { headers })
         .catch(() => ({ data: { results: [] } })),
+
       axios
         .get(`${SUAP_BASE_URL}/api/ensino/meu-boletim/${ano}/2/`, { headers })
         .catch(() => ({ data: { results: [] } })),
@@ -224,6 +216,7 @@ router.get("/boletim-anual/:ano", verificarToken, async (req, res) => {
 
     disciplinas1.forEach((d) => {
       const key = d.disciplina;
+
       if (!disciplinasMap.has(key)) {
         disciplinasMap.set(key, {
           codigo_diario: d.codigo_diario,
@@ -248,8 +241,10 @@ router.get("/boletim-anual/:ano", verificarToken, async (req, res) => {
 
       if (disciplinasMap.has(key)) {
         const existente = disciplinasMap.get(key);
+
         existente.nota_etapa_3 = d.nota_etapa_1 || { nota: null, faltas: 0 };
         existente.nota_etapa_4 = d.nota_etapa_2 || { nota: null, faltas: 0 };
+
         existente.numero_faltas += parseInt(d.numero_faltas) || 0;
         existente.segundo_semestre = true;
 
@@ -282,9 +277,7 @@ router.get("/boletim-anual/:ano", verificarToken, async (req, res) => {
       total_disciplinas: disciplinasMap.size,
     };
 
-    //// ===== ADICIONADO =====
     req.cache.set(cacheKey, response);
-    //// =====================
 
     res.json(response);
   } catch (err) {
