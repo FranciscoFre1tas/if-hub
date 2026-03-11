@@ -939,9 +939,9 @@ function preencherDashboard(data) {
 
   if (data.avaliacoes) {
     const proximas = safeArray(data.avaliacoes.proximas);
-    const disciplinas = safeArray(data.avaliacoes.historico);
+    
 
-    avaliacoes = [...proximas, ...disciplinas];
+    avaliacoes = [proximas];
   }
 
   if (containerAval) {
@@ -1281,7 +1281,11 @@ function preencherTurmas(data) {
 }
 
 function preencherAvaliacoes(data) {
-  console.log("DEBUG AVALIAÇÕES COMPLETAS:", data.avaliacoes);
+
+const container = document.getElementById("avaliacoes-content");
+if (!container) return;
+
+console.log("DEBUG AVALIAÇÕES COMPLETAS:", data.avaliacoes);
 
 let avaliacoes = [];
 
@@ -1308,6 +1312,7 @@ container.innerHTML = avaliacoes.map(av => `
         <div class="nota">${av.nota ?? "-"}</div>
     </div>
 `).join("");
+
 }
 
 function formatarData(dataStr) {
