@@ -1287,9 +1287,9 @@ let avaliacoes = [];
 
 if (data.avaliacoes) {
     const proximas = safeArray(data.avaliacoes.proximas);
-    const disciplinas = safeArray(data.avaliacoes.disciplinas);
+    const historico = safeArray(data.avaliacoes.historico);
 
-    avaliacoes = [...proximas, ...disciplinas];
+    avaliacoes = [...proximas, ...historico];
 }
   const container = document.getElementById("avaliacoes-timeline");
   if (!container) return;
@@ -1299,7 +1299,6 @@ if (data.avaliacoes) {
     return;
   }
 
-  avaliacoes = avaliacoes.filter(a => a.data);
 
   const sorted = [...avaliacoes].sort(
     (a, b) => new Date(a.data) - new Date(b.data),
