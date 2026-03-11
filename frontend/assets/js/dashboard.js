@@ -1411,24 +1411,242 @@ function formatarData(dataStr) {
 
 function mudarPeriodoBoletim() {}
 
+
+// ==========================================
+// NOTIFICAÇÕES PUSH
+// ==========================================
+
+const VAPID_PUBLIC_KEY = 'BF3gNzZD0R8kHDbLInuv0J_1qLUCg26c1YAeZDnCdNQEn5temWo9J5hsELxEpxiThe6IKC4d62B9uI1T2cLJNYk'; // COLE SUA VAPID PUBLIC KEY AQUI!
+
+// Variáveis de controle
+let notificationInitialized = false;
+
+// Helper: Converter VAPID key
+function urlBase64ToUint8Array(base64String) {
+    const padding = '='.repeat((4 - base64String.length % 4) % 4);
+    const base64 = (base64String + padding)
+        .replace(/\-/g, '+')
+        .replace(/_/g, '/');
+    
+    const rawData = window.atob(base64);
+    const outputArray = new Uint8Array(rawData.length);
+    
+    for (let i = 0; i < rawData.length; ++i) {
+        outputArray[i] = rawData.charCodeAt(i);
+    }
+    return outputArray;
+}
+
+// Inicializar notificações
+async function initNotifications() {
+    if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+        showToast('❌ Seu navegador não suporta notificações');
+        return;
+    }
+
+    try {
+        // 1. Registrar Service Worker
+        const registration = await navigator.serviceWorker.register('/service-worker.js');
+        console.log('SW registrado:', registration);
+
+        // 2. Pedir permissão
+        const permission = await Notification.requestPermission();
+        console.log('Permissão:', permission);
+
+        if (permission !== 'granted') {
+            showToast('⚠️ Permissão negada para notificações');
+            return;
+        }
+
+        // 3. Obter subscription
+        const subscription = await registration.pushManager.subscribe({
+            userVisibleOnly: true,
+            applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
+        });
+
+        console.log('Subscription:', subscription);
+
+        // 4. Enviar para backend
+        const token = localStorage.getItem('suap_token');
+        const response = await fetch(`${API_URL}/notifications/subscribe`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({
+                subscription: subscription,
+                token: token
+            })
+        });
+
+        if (response.ok) {
+            showToast('🔔 Notificações ativadas! Você receberá alertas de notas e avaliações.');
+            updateNotificationUI(true);
+            notificationInitialized = true;
+        } else {
+            throw new Error('Erro ao registrar no servidor');
+        }
+
+    } catch (err) {
+        console.error('Erro notificações:', err);
+        showToast('❌ Erro ao ativar notificações');
+    }
+}
+
+// Verificar status das notificações
+async function checkNotificationStatus() {
+    if (!('serviceWorker' in navigator)) return;
+
+    try {
+        const registration = await navigator.serviceWorker.ready;
+        const subscription = await registration.pushManager.getSubscription();
+        
+        // Verifica no backend também
+        const token = localStorage.getItem('suap_token');
+        const response = await fetch(`${API_URL}/notifications/status`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        const status = await response.json();
+        
+        if (subscription && status.subscribed) {
+            console.log('✅ Notificações ativas');
+            updateNotificationUI(true);
+            notificationInitialized = true;
+        } else {
+            updateNotificationUI(false);
+        }
+        
+    } catch (err) {
+        console.log('Status notificações:', err);
+        updateNotificationUI(false);
+    }
+}
+
+// Atualizar UI do botão de notificações
+function updateNotificationUI(isActive) {
+    const btn = document.getElementById('notification-btn');
+    if (!btn) return;
+    
+    if (isActive) {
+        btn.innerHTML = '<i class="fas fa-bell"></i> Notificações Ativas';
+        btn.classList.add('active');
+        btn.onclick = unsubscribeNotifications;
+    } else {
+        btn.innerHTML = '<i class="fas fa-bell-slash"></i> Ativar Notificações';
+        btn.classList.remove('active');
+        btn.onclick = initNotifications;
+    }
+}
+
+// Cancelar notificações
+async function unsubscribeNotifications() {
+    try {
+        const registration = await navigator.serviceWorker.ready;
+        const subscription = await registration.pushManager.getSubscription();
+        
+        if (subscription) {
+            await subscription.unsubscribe();
+        }
+        
+        const token = localStorage.getItem('suap_token');
+        await fetch(`${API_URL}/notifications/unsubscribe`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ token: token })
+        });
+        
+        showToast('🔕 Notificações desativadas');
+        updateNotificationUI(false);
+        
+    } catch (err) {
+        console.error('Erro ao cancelar:', err);
+    }
+}
+
+// Criar botão de notificações no header
+function criarBotaoNotificacoes() {
+    // Verifica se já existe
+    if (document.getElementById('notification-btn')) return;
+    
+    const btn = document.createElement('button');
+    btn.id = 'notification-btn';
+    btn.className = 'notification-btn';
+    btn.innerHTML = '<i class="fas fa-bell"></i> Ativar Notificações';
+    btn.onclick = initNotifications;
+    
+    // Insere no header
+    const header = document.querySelector('.ios-header');
+    if (header) {
+        header.appendChild(btn);
+    }
+}
+
+// Toast notification
+function showToast(message, duration = 3000) {
+    // Remove toast anterior
+    const existing = document.querySelector('.toast');
+    if (existing) existing.remove();
+    
+    const toast = document.createElement('div');
+    toast.className = 'toast';
+    toast.innerHTML = `
+        <i class="fas fa-info-circle"></i>
+        <span>${message}</span>
+    `;
+    document.body.appendChild(toast);
+    
+    // Animação de entrada
+    setTimeout(() => toast.classList.add('show'), 100);
+    
+    // Remove após duration
+    setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => toast.remove(), 300);
+    }, duration);
+}
+
+// Testar notificação manual (para debug)
+async function testarNotificacao() {
+    if (Notification.permission === 'granted') {
+        new Notification('🧪 Teste IF HUB', {
+            body: 'Suas notificações estão funcionando!',
+            icon: '/icons/icon-192.png',
+            badge: '/icons/icon-72.png'
+        });
+    } else {
+        showToast('❌ Permissão não concedida');
+    }
+}
+
 // ========== INICIALIZAÇÃO ==========
 document.addEventListener("DOMContentLoaded", function () {
-  console.log("Inicializando aplicação...");
-  carregarDados();
-  initializeFuse();
+    console.log("Inicializando aplicação...");
+    
+    carregarDados();
+    initializeFuse();
+    criarBotaoNotificacoes(); // Cria botão de notificações
+    checkNotificationStatus(); // Verifica status
 
-  // Garante que as funções estão no escopo global
-  window.performSmartSearch = performSmartSearch;
-  window.handleSearchInput = handleSearchInput;
-  window.selectRoom = selectRoom;
-  window.selectBuilding = selectBuilding;
-  window.zoomMap = zoomMap;
-  window.resetMap = resetMap;
-  window.showSection = showSection;
-  window.toggleSidebar = toggleSidebar;
-  window.closeSidebar = closeSidebar;
-  window.logout = logout;
-  window.trocarAno = trocarAno;
+    // Garante que as funções estão no escopo global
+    window.performSmartSearch = performSmartSearch;
+    window.handleSearchInput = handleSearchInput;
+    window.selectRoom = selectRoom;
+    window.selectBuilding = selectBuilding;
+    window.zoomMap = zoomMap;
+    window.resetMap = resetMap;
+    window.showSection = showSection;
+    window.toggleSidebar = toggleSidebar;
+    window.closeSidebar = closeSidebar;
+    window.logout = logout;
+    window.trocarAno = trocarAno;
+    window.initNotifications = initNotifications;
+    window.unsubscribeNotifications = unsubscribeNotifications;
+    window.testarNotificacao = testarNotificacao;
 
-  console.log("Funções registradas globalmente!");
+    console.log("Funções registradas globalmente!");
 });
