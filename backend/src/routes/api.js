@@ -128,23 +128,37 @@ router.get("/dashboard/:ano?", verificarToken, async (req, res) => {
 
 let avaliacoes = [];
 
-for (const d of disciplinas) {
-  try {
-    const etapas = await axios.get(
-      `${SUAP_BASE_URL}/api/ensino/disciplinas/${d.codigo_diario}/etapas/`,
-      { headers }
-    );
+await Promise.all(
+  disciplinas.map(async (d) => {
+    try {
+      const etapas = await axios.get(
+        `${SUAP_BASE_URL}/api/ensino/disciplinas/${d.codigo_diario}/etapas/`,
+        { headers }
+      );
 
-    avaliacoes.push({
-      disciplina: d.disciplina,
-      codigo: d.codigo_diario,
-      etapas: etapas.data
-    });
+      const etapasLista = etapas.data?.results || [];
 
-  } catch (e) {
-    console.log("Erro ao buscar etapas:", d.codigo_diario);
-  }
-}
+      etapasLista.forEach((etapa) => {
+        const avals = etapa.avaliacoes || [];
+
+        avals.forEach((av) => {
+          avaliacoes.push({
+            disciplina: d.disciplina,
+            codigo: d.codigo_diario,
+            etapa: etapa.numero_etapa,
+            tipo: av.tipo,
+            sigla: av.sigla,
+            data: av.data,
+            nota: av.nota
+          });
+        });
+      });
+
+    } catch (e) {
+      console.log("Erro ao buscar etapas:", d.codigo_diario);
+    }
+  })
+);
 
     const response = {
       anoSelecionado: ano,
