@@ -302,225 +302,216 @@
         </section>
 
         <!-- MAPA SECTION -->
-        <section id="mapa-section" class="content-section">
-            <!-- Painel de Busca de Salas com Autocomplete Inteligente -->
-            <div class="ios-panel" style="margin-bottom: 24px;">
-                <div class="panel-header">
-                    <div class="panel-title"><i class="fas fa-search-location"></i> Localizar Sala ou Bloco</div>
-                </div>
-                <div class="map-search-box">
-                    <div class="autocomplete-container" style="flex: 1; position: relative;">
-                        <input type="text" class="ios-input" id="room-search"
-                            placeholder="Digite: bibli, lab, sala 101, bloco A, cantina..."
-                            oninput="handleSearchInput()" onkeypress="if(event.key==='Enter') performSmartSearch()"
-                            autocomplete="off">
-                        <div class="autocomplete-suggestions" id="autocomplete-suggestions"></div>
-                    </div>
-                    <!-- Botão alterado para limpar pesquisa -->
-                    <button class="ios-btn" onclick="clearSearch()" style="padding: 16px 24px;" title="Limpar pesquisa">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
+<section id="mapa-section" class="content-section">
+    <!-- Painel de Busca de Salas com Autocomplete Inteligente -->
+    <div class="ios-panel" style="margin-bottom: 24px;">
+        <div class="panel-header">
+            <div class="panel-title"><i class="fas fa-search-location"></i> Localizar Sala ou Bloco</div>
+        </div>
+        <div class="map-search-box">
+            <div class="autocomplete-container" style="flex: 1; position: relative;">
+                <input type="text" class="ios-input" id="room-search"
+                    placeholder="Digite: bibli, lab, sala 101, bloco A, cantina..."
+                    oninput="handleSearchInput()" onkeypress="if(event.key==='Enter') performSmartSearch()"
+                    autocomplete="off">
+                <div class="autocomplete-suggestions" id="autocomplete-suggestions"></div>
+            </div>
+            <button class="ios-btn" onclick="clearSearch()" style="padding: 16px 24px;" title="Limpar pesquisa">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
 
-                <!-- Container de Resultados da Pesquisa -->
-                <div class="search-result-container" id="search-result-container">
-                    <div class="search-result-title" id="search-result-title"></div>
-                    <div class="search-result-content" id="search-result-content"></div>
-                </div>
+        <!-- Container de Resultados da Pesquisa -->
+        <div class="search-result-container" id="search-result-container">
+            <div class="search-result-title" id="search-result-title"></div>
+            <div class="search-result-content" id="search-result-content"></div>
+        </div>
+    </div>
 
-                <div style="text-align: center;">
-                    <p>Mapa em desenvolvimento!</p>
+    <!-- Mapa Interativo -->
+    <div class="ios-panel" style="padding: 0; overflow: hidden; position: relative;">
+        <div class="panel-header" style="padding: 20px 24px; margin: 0;">
+            <div class="panel-title"><i class="fas fa-map-marked-alt"></i> Mapa do Campus 3D</div>
+        </div>
+
+        <!-- Container do mapa -->
+        <div class="map-spiderman-container" id="map-container" style="border-radius: 0 0 24px 24px;">
+            <!-- Imagem de fundo -->
+            <img src="assets/img/campus-satellite.jpeg" alt="Campus IFRN" class="map-base-image" id="campus-image">
+            <div class="map-overlay"></div>
+
+            <!-- BLOCOS PRINCIPAIS (A, B, C, D, E, F) -->
+
+            <!-- Bloco A - Administração e Laboratórios (já existente) -->
+            <div class="building-3d tipo-lab" data-id="A" data-nome="Bloco A" data-andares="3"
+                style="left: 39%; top: 28%; width: 18%; height: 20%;" onclick="selectBuilding('A')">
+                <div class="building-top" style="width: 100%; height: 100%; border-color: var(--ios-accent-purple);">
+                    <span>A</span>
                 </div>
+                <div class="building-face front" style="width: 100%;"></div>
+                <div class="building-face side" style="width: 60px; height: 100%;"></div>
+                <div class="building-label">Bloco A - Labs & Salas</div>
             </div>
 
-            
-
-            <!-- Mapa Interativo -->
-            <div class="ios-panel" style="padding: 0; overflow: hidden; position: relative;">
-                <div class="panel-header" style="padding: 20px 24px; margin: 0;">
-                    <div class="panel-title"><i class="fas fa-map-marked-alt"></i> Mapa do Campus 3D</div>
+            <!-- Bloco B - Centro de Convivência (já existente) -->
+            <div class="building-3d tipo-admin" data-id="B" data-nome="Bloco B" data-andares="3"
+                style="left: 25%; bottom: 2%; width: 10%; height: 38%;" onclick="selectBuilding('B')">
+                <div class="building-top" style="width: 100%; height: 100%;">
+                    <span>B</span>
                 </div>
-
-                <!-- Container do mapa -->
-                <div class="map-spiderman-container" id="map-container" style="border-radius: 0 0 24px 24px;">
-                    <!-- Imagem de fundo (sua foto do Google Maps) -->
-                    <img src="assets/img/campus-satellite.jpeg" alt="Campus IFRN" class="map-base-image"
-                        id="campus-image">
-
-                    <div class="map-overlay"></div>
-
-                    <!-- Blocos 3D - Posições em % para responsividade -->
-                    <!-- Bloco B - Grande, 3 andares -->
-                    <div class="building-3d tipo-admin" data-id="B" data-nome="Bloco B" data-andares="3"
-                        style="left: 25%; bottom: 2%; width: 10%; height: 38%;" onclick="selectBuilding('B')">
-                        <div class="building-top" style="width: 100%; height: 100%;">
-                            <span>B</span>
-                        </div>
-                        <div class="building-face front" style="width: 100%;"></div>
-                        <div class="building-face side" style="width: 60px; height: 100%;"></div>
-                        <div class="building-label">Bloco B - Centro de Convivência</div>
-                    </div>
-
-                    <!-- Guarita (1) -->
-                    <div class="building-3d tipo-admin" data-id="1" data-nome="Guarita" data-andares="1"
-                        style="left: 38%; bottom: 2%; width: 4%; height: 8%;" onclick="selectBuilding('1')">
-                        <div class="building-top" style="width: 100%; height: 100%;">
-                            <span>1</span>
-                        </div>
-                        <div class="building-face front" style="width: 100%;"></div>
-                        <div class="building-label">Guarita/Portaria</div>
-                    </div>
-
-                    <!-- Cantina (2) -->
-                    <div class="building-3d tipo-alimentacao" data-id="2" data-nome="Cantina" data-andares="1"
-                        style="left: 30%; top: 24%; width: 5%; height: 24%;" onclick="selectBuilding('2')">
-                        <div class="building-top"
-                            style="width: 100%; height: 100%; border-color: var(--ios-accent-yellow);">
-                            <span>2</span>
-                        </div>
-                        <div class="building-face front" style="width: 100%;"></div>
-                        <div class="building-label">Cantina & Saúde</div>
-                    </div>
-
-                    <!-- Almoxarifado (3) -->
-                    <div class="building-3d tipo-admin" data-id="3" data-nome="Almoxarifado" data-andares="1"
-                        style="left: 30%; top: 8%; width: 5%; height: 15%;" onclick="selectBuilding('3')">
-                        <div class="building-top" style="width: 100%; height: 100%;">
-                            <span>3</span>
-                        </div>
-                        <div class="building-face front" style="width: 100%;"></div>
-                        <div class="building-label">Almoxarifado</div>
-                    </div>
-
-                    <!-- Bloco A - 3 andares -->
-                    <div class="building-3d tipo-lab" data-id="A" data-nome="Bloco A" data-andares="3"
-                        style="left: 39%; top: 28%; width: 18%; height: 20%;" onclick="selectBuilding('A')">
-                        <div class="building-top"
-                            style="width: 100%; height: 100%; border-color: var(--ios-accent-purple);">
-                            <span>A</span>
-                        </div>
-                        <div class="building-face front" style="width: 100%;"></div>
-                        <div class="building-face side" style="width: 60px; height: 100%;"></div>
-                        <div class="building-label">Bloco A - Labs & Salas</div>
-                    </div>
-
-                    <!-- Bloco 5 - Mecânica -->
-                    <div class="building-3d tipo-lab" data-id="5" data-nome="Bloco 5" data-andares="2"
-                        style="left: 46%; top: 8%; width: 13%; height: 10%;" onclick="selectBuilding('5')">
-                        <div class="building-top"
-                            style="width: 100%; height: 100%; border-color: var(--ios-accent-purple);">
-                            <span>5</span>
-                        </div>
-                        <div class="building-face front" style="width: 100%;"></div>
-                        <div class="building-label">Mecânica/Refrigeração</div>
-                    </div>
-
-                    <!-- Quadra de Areia -->
-                    <div class="building-3d tipo-esporte" data-id="bloco e" data-nome="Bloco E" data-andares="1" style="left: 73%;top: 8%;width: 11%;height: 7%;" onclick="selectBuilding('areia')">
-                        <div class="building-top" style="width: 100%;height: 100%;border-color: var(--ios-accent-orange);background: rgba(255, 159, 10, 0.2);">
-                            <i class="fas fa-volleyball-ball"></i>
-                        </div>
-                        <div class="building-face front" style="width: 100%;"></div>
-                        <div class="building-label">Bloco E</div>
-                    </div>
-
-                    <!-- Quadra de Areia -->
-                    <div class="building-3d tipo-esporte" data-id="areia" data-nome="Quadra de Areia" data-andares="1"
-                        style="left: 60%; top: 25%; width: 10%; height: 23%;" onclick="selectBuilding('areia')">
-                        <div class="building-top"
-                            style="width: 100%; height: 100%; border-color: var(--ios-accent-orange); background: rgba(255, 159, 10, 0.2);">
-                            <i class="fas fa-volleyball-ball"></i>
-                        </div>
-                        <div class="building-face front" style="width: 100%;"></div>
-                        <div class="building-label">Quadra de Areia</div>
-                    </div>
-
-                    <!-- Espaço Multiuso (4) -->
-                    <div class="building-3d tipo-esporte" data-id="4" data-nome="Espaço Multiuso" data-andares="1"
-                        style="left: 70.5%; top: 45%; width: 4%; height: 7%;" onclick="selectBuilding('4')">
-                        <div class="building-top"
-                            style="width: 100%; height: 100%; border-color: var(--ios-accent-orange);">
-                            <span>4</span>
-                        </div>
-                        <div class="building-face front" style="width: 100%;"></div>
-                        <div class="building-label">Espaço Multiuso</div>
-                    </div>
-
-                    <!-- Quadra Poliesportiva -->
-                    <div class="building-3d tipo-esporte" data-id="quadra" data-nome="Quadra Poliesportiva"
-                        data-andares="1" style="left: 79%; top: 22%; width: 18%; height: 20%; transform: rotate(57deg);"
-                        onclick="selectBuilding('quadra')">
-                        <div class="building-top"
-                            style="width: 100%; height: 100%; border-color: var(--ios-accent-orange); background: rgba(255, 159, 10, 0.2);">
-                            <i class="fas fa-basketball-ball"></i>
-                        </div>
-                        <div class="building-face front" style="width: 100%;"></div>
-                        <div class="building-label">Quadra & Vestiários</div>
-                    </div>
-
-                    <!-- Piscina (6) -->
-                    <div class="building-3d tipo-esporte" data-id="6" data-nome="Piscina" data-andares="1"
-                        style="right: 0.5%; top: 45%; width: 10%; height: 8%; transform: rotate(-34deg);"
-                        onclick="selectBuilding('6')">
-                        <div class="building-top"
-                            style="width: 100%; height: 100%; border-color: var(--ios-accent-blue); background: rgba(10, 132, 255, 0.2);">
-                            <i class="fas fa-swimming-pool"></i>
-                        </div>
-                        <div class="building-face front" style="width: 100%;"></div>
-                        <div class="building-label">Piscina</div>
-                    </div>
-                </div>
+                <div class="building-face front" style="width: 100%;"></div>
+                <div class="building-face side" style="width: 60px; height: 100%;"></div>
+                <div class="building-label">Bloco B - Centro de Convivência</div>
             </div>
 
-            <!-- Atalhos rápidos para categorias -->
-            <div class="quick-links" style="margin-top: 16px; margin-bottom: 16px;">
-                <button class="quick-link" onclick="filterByCategory('lab')" style="background: var(--glass-bg);">
-                    <i class="fas fa-flask"></i>
-                    <span>Laboratórios</span>
-                </button>
-                <button class="quick-link" onclick="filterByCategory('biblioteca')">
-                    <i class="fas fa-book"></i>
-                    <span>Bibliotecas</span>
-                </button>
-                <button class="quick-link" onclick="filterByCategory('esporte')">
-                    <i class="fas fa-futbol"></i>
-                    <span>Esportes</span>
-                </button>
-                <button class="quick-link" onclick="filterByCategory('alimentacao')">
-                    <i class="fas fa-utensils"></i>
-                    <span>Alimentação</span>
-                </button>
+            <!-- Bloco C - Almoxarifado + Cantina + Saúde (NOVO - substitui 2 e 3) -->
+            <div class="building-3d tipo-admin" data-id="C" data-nome="Bloco C" data-andares="1"
+                style="left: 30%; top: 15%; width: 12%; height: 25%;" onclick="selectBuilding('C')">
+                <div class="building-top" style="width: 100%; height: 100%; border-color: var(--ios-accent-orange);">
+                    <span>C</span>
+                </div>
+                <div class="building-face front" style="width: 100%;"></div>
+                <div class="building-label">Bloco C - Almoxarifado/Cantina/Saúde</div>
             </div>
 
-            <!-- Informações do Campus -->
-            <div class="ios-panel">
-                <div class="panel-header">
-                    <div class="panel-title"><i class="fas fa-info-circle"></i> Informações do Campus</div>
+            <!-- Bloco D - Mecânica/Refrigeração (renomeado de "Bloco 5") -->
+            <div class="building-3d tipo-lab" data-id="D" data-nome="Bloco D" data-andares="2"
+                style="left: 46%; top: 8%; width: 13%; height: 10%;" onclick="selectBuilding('D')">
+                <div class="building-top" style="width: 100%; height: 100%; border-color: var(--ios-accent-purple);">
+                    <span>D</span>
                 </div>
-                <div class="profile-grid">
-                    <div class="info-row">
-                        <span class="info-label"><i class="fas fa-map-marker-alt"
-                                style="margin-right: 8px; color: var(--ios-accent-green);"></i>Endereço</span>
-                        <span class="info-value">Rua São Braz, nº 304, Paraíso - Santa Cruz-RN</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label"><i class="fas fa-clock"
-                                style="margin-right: 8px; color: var(--ios-accent-blue);"></i>Funcionamento</span>
-                        <span class="info-value">07:00 - 22:00 (Seg-Sex)</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label"><i class="fas fa-phone"
-                                style="margin-right: 8px; color: var(--ios-accent-purple);"></i>Telefone</span>
-                        <span class="info-value">(84) 4005-4110</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label"><i class="fas fa-envelope"
-                                style="margin-right: 8px; color: var(--ios-accent-orange);"></i>Email</span>
-                        <span class="info-value">cosgem.sc@ifrn.edu.br</span>
-                    </div>
-                </div>
+                <div class="building-face front" style="width: 100%;"></div>
+                <div class="building-label">Bloco D - Mecânica/Refrigeração</div>
             </div>
-        </section>
+
+            <!-- Bloco E - GINÁSIO (parte 1) -->
+            <div class="building-3d tipo-esporte" data-id="E-ginasio" data-nome="Ginásio" data-andares="1"
+                style="left: 70%; top: 8%; width: 15%; height: 12%;" onclick="selectBuilding('E-ginasio')">
+                <div class="building-top" style="width:100%;height:100%;border-color:#FF3B30; background:rgba(255,59,48,0.2);">
+                    <i class="fas fa-dumbbell"></i>
+                </div>
+                <div class="building-face front" style="width:100%;"></div>
+                <div class="building-label">Ginásio</div>
+            </div>
+
+            <!-- Bloco E - PRÉDIO ANEXO (parte 2 - música, NUARTE) -->
+            <div class="building-3d tipo-esporte" data-id="E-anexo" data-nome="Prédio Anexo" data-andares="2"
+                style="left: 70%; top: 21%; width: 10%; height: 15%;" onclick="selectBuilding('E-anexo')">
+                <div class="building-top" style="width:100%;height:100%;border-color:#FF3B30;">
+                    <span>E</span>
+                </div>
+                <div class="building-face front" style="width:100%;"></div>
+                <div class="building-face side" style="width:60px; height:100%;"></div>
+                <div class="building-label">Música/NUARTE</div>
+            </div>
+
+            <!-- PISCINA (separada, já existia como 6) -->
+            <div class="building-3d tipo-esporte" data-id="6" data-nome="Piscina" data-andares="1"
+                style="right: 0.5%; top: 45%; width: 10%; height: 8%; transform: rotate(-34deg);"
+                onclick="selectBuilding('6')">
+                <div class="building-top" style="width:100%;height:100%;border-color:var(--ios-accent-blue); background:rgba(10,132,255,0.2);">
+                    <i class="fas fa-swimming-pool"></i>
+                </div>
+                <div class="building-face front" style="width:100%;"></div>
+                <div class="building-label">Piscina</div>
+            </div>
+
+            <!-- Bloco F - Garagem/Depósitos (NOVO) -->
+            <div class="building-3d tipo-admin" data-id="F" data-nome="Bloco F" data-andares="1"
+                style="left: 50%; top: 70%; width: 15%; height: 12%;" onclick="selectBuilding('F')">
+                <div class="building-top" style="width:100%;height:100%;border-color:#8E8E93;">
+                    <span>F</span>
+                </div>
+                <div class="building-face front" style="width:100%;"></div>
+                <div class="building-label">Bloco F - Garagem</div>
+            </div>
+
+            <!-- ELEMENTOS EXTERNOS (já existentes) -->
+
+            <!-- Guarita (1) -->
+            <div class="building-3d tipo-admin" data-id="1" data-nome="Guarita" data-andares="1"
+                style="left: 38%; bottom: 2%; width: 4%; height: 8%;" onclick="selectBuilding('1')">
+                <div class="building-top" style="width: 100%; height: 100%;">
+                    <span>1</span>
+                </div>
+                <div class="building-face front" style="width: 100%;"></div>
+                <div class="building-label">Guarita/Portaria</div>
+            </div>
+
+            <!-- Espaço Multiuso (4) - confirmado que existe -->
+            <div class="building-3d tipo-esporte" data-id="4" data-nome="Espaço Multiuso" data-andares="1"
+                style="left: 70.5%; top: 45%; width: 4%; height: 7%;" onclick="selectBuilding('4')">
+                <div class="building-top" style="width: 100%; height: 100%; border-color: var(--ios-accent-orange);">
+                    <span>4</span>
+                </div>
+                <div class="building-face front" style="width: 100%;"></div>
+                <div class="building-label">Espaço Multiuso</div>
+            </div>
+
+            <!-- Quadra de Areia -->
+            <div class="building-3d tipo-esporte" data-id="areia" data-nome="Quadra de Areia" data-andares="1"
+                style="left: 60%; top: 25%; width: 10%; height: 23%;" onclick="selectBuilding('areia')">
+                <div class="building-top" style="width:100%;height:100%;border-color:var(--ios-accent-orange); background:rgba(255,159,10,0.2);">
+                    <i class="fas fa-volleyball-ball"></i>
+                </div>
+                <div class="building-face front" style="width:100%;"></div>
+                <div class="building-label">Quadra de Areia</div>
+            </div>
+
+            <!-- Quadra Poliesportiva -->
+            <div class="building-3d tipo-esporte" data-id="quadra" data-nome="Quadra Poliesportiva" data-andares="1"
+                style="left: 79%; top: 22%; width: 18%; height: 20%; transform: rotate(57deg);"
+                onclick="selectBuilding('quadra')">
+                <div class="building-top" style="width:100%;height:100%;border-color:var(--ios-accent-orange); background:rgba(255,159,10,0.2);">
+                    <i class="fas fa-basketball-ball"></i>
+                </div>
+                <div class="building-face front" style="width:100%;"></div>
+                <div class="building-label">Quadra & Vestiários</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Atalhos rápidos para categorias -->
+    <div class="quick-links" style="margin-top: 16px; margin-bottom: 16px;">
+        <button class="quick-link" onclick="filterByCategory('lab')" style="background: var(--glass-bg);">
+            <i class="fas fa-flask"></i> <span>Laboratórios</span>
+        </button>
+        <button class="quick-link" onclick="filterByCategory('biblioteca')">
+            <i class="fas fa-book"></i> <span>Bibliotecas</span>
+        </button>
+        <button class="quick-link" onclick="filterByCategory('esporte')">
+            <i class="fas fa-futbol"></i> <span>Esportes</span>
+        </button>
+        <button class="quick-link" onclick="filterByCategory('alimentacao')">
+            <i class="fas fa-utensils"></i> <span>Alimentação</span>
+        </button>
+    </div>
+
+    <!-- Informações do Campus -->
+    <div class="ios-panel">
+        <div class="panel-header">
+            <div class="panel-title"><i class="fas fa-info-circle"></i> Informações do Campus</div>
+        </div>
+        <div class="profile-grid">
+            <div class="info-row">
+                <span class="info-label"><i class="fas fa-map-marker-alt" style="margin-right: 8px; color: var(--ios-accent-green);"></i>Endereço</span>
+                <span class="info-value">Rua São Braz, nº 304, Paraíso - Santa Cruz-RN</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label"><i class="fas fa-clock" style="margin-right: 8px; color: var(--ios-accent-blue);"></i>Funcionamento</span>
+                <span class="info-value">07:00 - 22:00 (Seg-Sex)</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label"><i class="fas fa-phone" style="margin-right: 8px; color: var(--ios-accent-purple);"></i>Telefone</span>
+                <span class="info-value">(84) 4005-4110</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label"><i class="fas fa-envelope" style="margin-right: 8px; color: var(--ios-accent-orange);"></i>Email</span>
+                <span class="info-value">cosgem.sc@ifrn.edu.br</span>
+            </div>
+        </div>
+    </div>
+</section>
 
         <!-- PERÍODOS SECTION -->
         <section id="periodos-section" class="content-section">

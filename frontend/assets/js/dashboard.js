@@ -36,67 +36,62 @@ async function carregarDadosMapa() {
 
     // --- Construir buildingData combinando blocos do JSON com os blocos personalizados ---
     // Blocos personalizados que já existem no mapa 3D (Guarita, Cantina, etc.)
-    const blocosPersonalizados = {
-      1: {
-        nome: "Guarita",
-        descricao: "Entrada principal",
-        andares: { Térreo: ["Portaria"] },
-        icon: "shield-alt",
-        cor: "var(--ios-accent-blue)",
-      },
-      2: {
-        nome: "Cantina",
-        descricao: "Alimentação",
-        andares: { Térreo: ["Cantina", "Restaurante"] },
-        icon: "utensils",
-        cor: "var(--ios-accent-yellow)",
-      },
-      3: {
-        nome: "Almoxarifado",
-        descricao: "Armazenamento",
-        andares: { Térreo: ["Almoxarifado"] },
-        icon: "boxes",
-        cor: "var(--ios-accent-blue)",
-      },
-      4: {
-        nome: "Espaço Multiuso",
-        descricao: "Atividades diversas",
-        andares: { Térreo: ["Ginástica"] },
-        icon: "table-tennis",
-        cor: "var(--ios-accent-orange)",
-      },
-      5: {
-        nome: "Bloco 5",
-        descricao: "Mecânica e Refrigeração",
-        andares: {
-          Térreo: ["Oficina Mecânica"],
-          "1º Andar": ["Lab. Refrigeração"],
-        },
-        icon: "cogs",
-        cor: "var(--ios-accent-purple)",
-      },
-      6: {
-        nome: "Piscina",
-        descricao: "Natação",
-        andares: { Externo: ["Piscina"] },
-        icon: "swimming-pool",
-        cor: "var(--ios-accent-blue)",
-      },
-      areia: {
-        nome: "Quadra de Areia",
-        descricao: "Esportes de praia",
-        andares: { Externo: ["Vôlei de Praia"] },
-        icon: "volleyball-ball",
-        cor: "var(--ios-accent-orange)",
-      },
-      quadra: {
-        nome: "Quadra Poliesportiva",
-        descricao: "Esportes",
-        andares: { Externo: ["Basquete", "Futsal"] },
-        icon: "basketball-ball",
-        cor: "var(--ios-accent-orange)",
-      },
-    };
+const blocosPersonalizados = {
+  1: {
+    nome: "Guarita",
+    descricao: "Entrada principal",
+    andares: { Térreo: ["Portaria"] },
+    icon: "shield-alt",
+    cor: "var(--ios-accent-blue)",
+  },
+  4: {
+    nome: "Espaço Multiuso",
+    descricao: "Atividades diversas",
+    andares: { Térreo: ["Ginástica", "Eventos"] },
+    icon: "table-tennis",
+    cor: "var(--ios-accent-orange)",
+  },
+  6: {
+    nome: "Piscina",
+    descricao: "Natação",
+    andares: { Externo: ["Piscina"] },
+    icon: "swimming-pool",
+    cor: "var(--ios-accent-blue)",
+  },
+  areia: {
+    nome: "Quadra de Areia",
+    descricao: "Esportes de praia",
+    andares: { Externo: ["Vôlei de Praia", "Futevôlei"] },
+    icon: "volleyball-ball",
+    cor: "var(--ios-accent-orange)",
+  },
+  quadra: {
+    nome: "Quadra Poliesportiva",
+    descricao: "Esportes",
+    andares: { Externo: ["Basquete", "Futsal", "Handebol"] },
+    icon: "basketball-ball",
+    cor: "var(--ios-accent-orange)",
+  },
+  "E-ginasio": {
+    nome: "Ginásio",
+    descricao: "Educação Física",
+    andares: {
+      Térreo: ["Quadra", "Academia", "Vestiários Masculino", "Vestiários Feminino"]
+    },
+    icon: "dumbbell",
+    cor: "#FF3B30",
+  },
+  "E-anexo": {
+    nome: "Prédio Anexo - Música e Arte",
+    descricao: "Laboratórios de Música e Arte",
+    andares: {
+      "1º Andar": ["Lab. de Música", "Sala de Música"],
+      "2º Andar": ["Coord. NUARTE", "Lab. Cenográfico", "Grêmio"]
+    },
+    icon: "music",
+    cor: "#FF3B30",
+  },
+};
 
     // Blocos do JSON (A, B, C, D, E, F)
     const blocosJSON = {};
