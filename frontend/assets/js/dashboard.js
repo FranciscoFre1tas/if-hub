@@ -1418,12 +1418,10 @@ function mudarPeriodoBoletim() {}
 
 const messaging = firebase.messaging();
 
-// Inicializar notificações
 async function initNotifications() {
   try {
-    console.log('🔔 Iniciando Firebase Messaging...');
+    console.log('🔔 Iniciando Firebase...');
     
-    // Solicitar permissão
     const permission = await Notification.requestPermission();
     if (permission !== 'granted') {
       showToast('⚠️ Permissão negada');
@@ -1432,7 +1430,7 @@ async function initNotifications() {
 
     // Obter token FCM
     const token = await messaging.getToken({
-      vapidKey: 'SUA_VAPID_KEY_DO_FIREBASE' // Web Push Certificates → Key pair
+      vapidKey: 'SUA_VAPID_PUBLIC_KEY_DO_FIREBASE' // Web Push certificates
     });
 
     if (!token) {
@@ -1440,7 +1438,7 @@ async function initNotifications() {
       return;
     }
 
-    console.log('✅ FCM Token:', token);
+    console.log('✅ FCM Token:', token.substring(0, 30) + '...');
 
     // Enviar para backend
     const suapToken = localStorage.getItem('suap_token');
@@ -1450,10 +1448,7 @@ async function initNotifications() {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${suapToken}`
       },
-      body: JSON.stringify({
-        fcmToken: token,
-        token: suapToken
-      })
+      body: JSON.stringify({ fcmToken: token, token: suapToken })
     });
 
     showToast('🔔 Notificações ativadas!');
@@ -1461,11 +1456,10 @@ async function initNotifications() {
 
     // Listener para mensagens em foreground
     messaging.onMessage((payload) => {
-      console.log('📨 Mensagem recebida:', payload);
+      console.log('📨 Foreground:', payload);
       new Notification(payload.notification.title, {
         body: payload.notification.body,
-        icon: payload.notification.icon || '/assets/icons/IF HUB - SEM FUNDO - 192x192.png',
-        data: payload.data
+        icon: payload.notification.icon
       });
     });
 
@@ -1475,7 +1469,6 @@ async function initNotifications() {
   }
 }
 
-// Verificar status
 async function checkNotificationStatus() {
   try {
     const permission = Notification.permission;
@@ -1485,18 +1478,13 @@ async function checkNotificationStatus() {
     }
 
     const token = await messaging.getToken();
-    const isSubscribed = !!token;
+    updateNotificationUI(!!token);
     
-    console.log('Status FCM:', isSubscribed ? 'Ativo' : 'Inativo');
-    updateNotificationUI(isSubscribed);
-
   } catch (err) {
-    console.log('Erro check:', err);
     updateNotificationUI(false);
   }
 }
 
-// Cancelar notificações
 async function unsubscribeNotifications() {
   try {
     await messaging.deleteToken();
@@ -1504,28 +1492,18 @@ async function unsubscribeNotifications() {
     const token = localStorage.getItem('suap_token');
     await fetch(`${API_URL}/notifications/unsubscribe`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify({ token: token })
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+      body: JSON.stringify({ token })
     });
 
     showToast('🔕 Notificações desativadas');
     updateNotificationUI(false);
-
+    
   } catch (err) {
-    console.error('Erro ao cancelar:', err);
+    console.error('Erro:', err);
   }
 }
 
-// Testar notificação (envia do console do Firebase)
-async function testarNotificacao() {
-  // Só funciona se o backend enviar, ou use o console do Firebase
-  showToast('🧪 Use o Firebase Console → Cloud Messaging → Enviar mensagem de teste');
-}
-
-// UI do botão (mantém igual)
 function updateNotificationUI(isActive) {
   const btn = document.getElementById('notification-btn');
   if (!btn) return;

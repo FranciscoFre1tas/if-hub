@@ -13,17 +13,12 @@ firebase.initializeApp({
 
 const messaging = firebase.messaging();
 
-// Background messages
 messaging.onBackgroundMessage((payload) => {
   console.log('[firebase-messaging-sw.js] Background:', payload);
   
   self.registration.showNotification(payload.notification.title, {
     body: payload.notification.body,
     icon: payload.notification.icon || '/assets/icons/IF HUB - SEM FUNDO - 192x192.png',
-    badge: '/assets/icons/badge-72x72.png',
-    data: payload.data,
-    actions: [
-      { action: 'open', title: 'Abrir' }
-    ]
+    data: payload.data
   });
 });

@@ -3,21 +3,23 @@ const express = require('express');
 const cors = require('cors');
 const session = require('express-session');
 const axios = require('axios');
-const webpush = require('web-push');
+const admin = require('firebase-admin');
 const cron = require('node-cron');
 
 // ===== CACHE =====
 const NodeCache = require('node-cache');
 const cache = new NodeCache({ stdTTL: 300 });
 
-// ===== CONFIGURAR WEB PUSH =====
-webpush.setVapidDetails(
-    process.env.VAPID_SUBJECT || 'mailto:contato@ifhub.com',
-    process.env.VAPID_PUBLIC_KEY,
-    process.env.VAPID_PRIVATE_KEY
-);
+// ===== FIREBASE ADMIN =====
+admin.initializeApp({
+  credential: admin.credential.cert({
+    projectId: process.env.FIREBASE_PROJECT_ID,
+    clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+    privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n')
+  })
+});
 
-// Armazena subscriptions: token -> {subscription, lastNotas, lastAvaliacoes}
+// Armazena: token -> {fcmToken, lastCheck, lastNotas, lastAvaliacoes}
 const subscriptions = new Map();
 
 // ===== IMPORTS =====
@@ -56,20 +58,20 @@ app.get('/ping', (req, res) => {
 // Inscrever para notificações
 app.post('/api/notifications/subscribe', async (req, res) => {
     try {
-        const { subscription, token } = req.body;
+        const { fcmToken, token } = req.body;
         
-        if (!subscription || !token) {
+        if (!fcmToken || !token) {
             return res.status(400).json({ erro: 'Dados incompletos' });
         }
 
         subscriptions.set(token, {
-            subscription,
+            fcmToken,
             lastCheck: new Date(),
             lastNotas: new Map(),
             lastAvaliacoes: new Set()
         });
 
-        console.log(`✅ Inscrito: ${token.substring(0, 20)}...`);
+        console.log(`✅ Inscrito: ${fcmToken.substring(0, 30)}...`);
         res.json({ success: true });
 
     } catch (err) {
@@ -106,18 +108,12 @@ app.get('/api/test/notificacao', async (req, res) => {
     let enviadas = 0;
     
     for (const [token, userData] of subscriptions) {
-        try {
-            await webpush.sendNotification(userData.subscription, JSON.stringify({
-                title: '🧪 Teste IF HUB',
-                body: 'Suas notificações estão funcionando! 🎉',
-                tag: 'teste-' + Date.now(),
-                url: '/dashboard.html',
-                actions: [{ action: 'ver', title: 'Abrir App' }]
-            }));
-            enviadas++;
-        } catch (err) {
-            console.error('Erro:', err.message);
-        }
+        const sucesso = await enviarFCM(userData.fcmToken, {
+            title: '🧪 Teste IF HUB',
+            body: 'Suas notificações estão funcionando! 🎉',
+            url: '/dashboard.html'
+        });
+        if (sucesso) enviadas++;
     }
     
     res.json({ enviadas, total: subscriptions.size });
@@ -129,9 +125,8 @@ app.get('/api/test/status', (req, res) => {
     for (const [token, data] of subscriptions) {
         status.push({
             token: token.substring(0, 20) + '...',
-            lastCheck: data.lastCheck,
-            totalNotas: data.lastNotas.size,
-            totalAvaliacoes: data.lastAvaliacoes.size
+            fcmToken: data.fcmToken.substring(0, 30) + '...',
+            lastCheck: data.lastCheck
         });
     }
     res.json({ subscriptions: status, total: subscriptions.size });
@@ -144,13 +139,11 @@ app.get('/api/test/simular-avaliacao', async (req, res) => {
     }
 
     for (const [token, userData] of subscriptions) {
-        await webpush.sendNotification(userData.subscription, JSON.stringify({
+        await enviarFCM(userData.fcmToken, {
             title: '📝 Nova Avaliação Agendada!',
             body: 'Prova de Matemática em 7 dias (SIMULAÇÃO)',
-            tag: 'simulada-' + Date.now(),
-            url: '/dashboard.html#avaliacoes',
-            actions: [{ action: 'ver', title: 'Ver Avaliações' }]
-        }));
+            url: '/dashboard.html#avaliacoes'
+        });
     }
     
     res.json({ simulado: true, para: subscriptions.size });
@@ -209,13 +202,11 @@ async function verificarNovidades(token, userData) {
                     
                     userData.lastNotas.set(notaKey, notaAtual);
                     
-                    await webpush.sendNotification(userData.subscription, JSON.stringify({
+                    await enviarFCM(userData.fcmToken, {
                         title: '📊 Nota Publicada!',
                         body: `${disc.disciplina.split(' - ')[1] || disc.disciplina}: ${notaAtual} (${etapa}ª etapa)`,
-                        tag: `nota-${notaKey}`,
-                        url: '/dashboard.html#boletim',
-                        actions: [{ action: 'ver', title: 'Ver Boletim' }]
-                    }));
+                        url: '/dashboard.html#boletim'
+                    });
                     
                     notificacoes++;
                 }
@@ -249,13 +240,11 @@ async function verificarNovidades(token, userData) {
                 
                 const dias = Math.ceil((new Date(av.data) - new Date()) / (1000 * 60 * 60 * 24));
                 
-                await webpush.sendNotification(userData.subscription, JSON.stringify({
+                await enviarFCM(userData.fcmToken, {
                     title: '📝 Nova Avaliação Agendada!',
                     body: `${av.descricao || 'Prova'} em ${dias} dias`,
-                    tag: `av-${avId}`,
-                    url: '/dashboard.html#avaliacoes',
-                    actions: [{ action: 'ver', title: 'Ver Avaliações' }]
-                }));
+                    url: '/dashboard.html#avaliacoes'
+                });
                 
                 notificacoes++;
             }
@@ -266,6 +255,38 @@ async function verificarNovidades(token, userData) {
 
     userData.lastCheck = new Date();
     console.log(`  ✅ ${notificacoes} notificação(ões)\n`);
+}
+
+// Helper: enviar notificação via FCM
+async function enviarFCM(fcmToken, data) {
+    try {
+        await admin.messaging().send({
+            token: fcmToken,
+            notification: {
+                title: data.title,
+                body: data.body
+            },
+            webpush: {
+                fcmOptions: {
+                    link: 'https://if-hub.netlify.app' + data.url
+                },
+                notification: {
+                    icon: 'https://if-hub.netlify.app/assets/icons/IF HUB - SEM FUNDO - 192x192.png',
+                    badge: 'https://if-hub.netlify.app/assets/icons/badge-72x72.png'
+                }
+            }
+        });
+        console.log('✅ FCM enviado');
+        return true;
+        
+    } catch (err) {
+        console.error('❌ Erro FCM:', err.code, err.message);
+        if (err.code === 'messaging/registration-token-not-registered') {
+            // Token inválido
+            return false;
+        }
+        return false;
+    }
 }
 
 // ===== ROTAS PRINCIPAIS =====
