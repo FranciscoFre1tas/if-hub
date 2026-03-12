@@ -206,8 +206,8 @@ const buildingData = {
     icon: "flask",
     cor: "var(--ios-accent-purple)",
   },
-  E: {
-    nome: "Bloco E",
+  5: {
+    nome: "Bloco 5",
     descricao: "Mecânica e Refrigeração",
     andares: {
       Térreo: ["Oficina Mecânica"],
