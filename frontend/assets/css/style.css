@@ -1,16 +1,16 @@
 :root {
-    /* iOS 26.3 Liquid Glass Variables */
+    /* iOS 26.3 Liquid Glass Variables - Otimizado */
     --glass-bg: rgba(255, 255, 255, 0.08);
     --glass-bg-elevated: rgba(255, 255, 255, 0.12);
     --glass-bg-hover: rgba(255, 255, 255, 0.16);
     --glass-border: rgba(255, 255, 255, 0.18);
     --glass-border-strong: rgba(255, 255, 255, 0.25);
-    --liquid-blur: blur(40px) saturate(200%);
-    --liquid-blur-heavy: blur(60px) saturate(220%);
-    --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-    --glass-shadow-elevated: 0 25px 50px rgba(0, 0, 0, 0.5);
+    --liquid-blur: blur(15px) saturate(150%);
+    --liquid-blur-heavy: blur(25px) saturate(180%);
+    --glass-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+    --glass-shadow-elevated: 0 12px 30px rgba(0, 0, 0, 0.4);
 
-    /* iOS 26 Color Palette - Dynamic */
+    /* iOS 26 Color Palette - Dynamic (mantido) */
     --ios-bg: #0a0a0f;
     --ios-bg-secondary: #12121a;
     --ios-text-primary: #d8d8d8;
@@ -23,7 +23,7 @@
     --ios-accent-teal: #64d2ff;
     --ios-accent-yellow: #ffd60a;
 
-    /* Gradients iOS Style */
+    /* Gradients iOS Style (mantido) */
     --gradient-primary: linear-gradient(135deg, #30d158 0%, #28b94d 100%);
     --gradient-blue: linear-gradient(135deg, #0a84ff 0%, #0066cc 100%);
     --gradient-purple: linear-gradient(135deg, #bf5af2 0%, #994fd1 100%);
@@ -62,7 +62,7 @@ body {
     letter-spacing: -0.022em;
 }
 
-/* Liquid Background - Floating Bubbles */
+/* Liquid Background - Floating Bubbles (otimizado: blur reduzido) */
 .liquid-background {
     position: fixed;
     inset: 0;
@@ -74,8 +74,8 @@ body {
 .bubble {
     position: absolute;
     border-radius: 50%;
-    filter: blur(40px);
-    opacity: 0.8;
+    filter: blur(20px); /* reduzido de 40px */
+    opacity: 0.6; /* levemente reduzido para suavizar */
     animation: float 25s infinite ease-in-out;
     pointer-events: none;
 }
@@ -126,23 +126,10 @@ body {
 }
 
 @keyframes float {
-
-    0%,
-    100% {
-        transform: translate(0, 0) scale(1);
-    }
-
-    25% {
-        transform: translate(20px, -30px) scale(1.05);
-    }
-
-    50% {
-        transform: translate(-10px, 20px) scale(0.95);
-    }
-
-    75% {
-        transform: translate(15px, 10px) scale(1.02);
-    }
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    25% { transform: translate(15px, -20px) scale(1.03); } /* movimento reduzido */
+    50% { transform: translate(-8px, 15px) scale(0.97); }
+    75% { transform: translate(10px, 8px) scale(1.01); }
 }
 
 /* Glass Container Base */
@@ -162,7 +149,7 @@ body {
     top: 0;
     width: 300px;
     height: 100vh;
-    background: rgba(10, 10, 15, 0.7);
+    background: rgba(10, 10, 15, 0.8); /* mais opaco para compensar blur reduzido */
     backdrop-filter: var(--liquid-blur-heavy);
     -webkit-backdrop-filter: var(--liquid-blur-heavy);
     border-right: 1px solid var(--glass-border);
@@ -170,7 +157,7 @@ body {
     display: flex;
     flex-direction: column;
     padding: 24px;
-    transition: transform 0.5s cubic-bezier(0.32, 0.72, 0, 1);
+    transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1);
 }
 
 .sidebar-header {
@@ -196,13 +183,13 @@ body {
     align-items: center;
     gap: 14px;
     margin-bottom: 24px;
-    transition: all 0.3s ease;
+    transition: all 0.2s ease;
     cursor: pointer;
 }
 
 .user-card:hover {
     background: var(--glass-bg-hover);
-    transform: scale(1.02);
+    transform: scale(1.01);
 }
 
 .user-avatar {
@@ -216,7 +203,7 @@ body {
     font-weight: 600;
     font-size: 1.4rem;
     border: 2px solid rgba(255, 255, 255, 0.2);
-    box-shadow: 0 4px 20px rgba(48, 209, 88, 0.3);
+    box-shadow: 0 2px 10px rgba(48, 209, 88, 0.2); /* shadow reduzido */
     overflow: hidden;
     flex-shrink: 0;
 }
@@ -258,7 +245,7 @@ body {
     color: var(--ios-text-secondary);
     text-decoration: none;
     border-radius: 16px;
-    transition: all 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+    transition: all 0.2s ease;
     cursor: pointer;
     position: relative;
     overflow: hidden;
@@ -272,7 +259,7 @@ body {
     inset: 0;
     background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, transparent 100%);
     opacity: 0;
-    transition: opacity 0.3s;
+    transition: opacity 0.2s;
 }
 
 .nav-link:hover::before,
@@ -283,25 +270,25 @@ body {
 .nav-link:hover {
     color: var(--ios-text-primary);
     background: var(--glass-bg);
-    transform: translateX(4px);
+    transform: translateX(2px);
 }
 
 .nav-link.active {
     color: var(--ios-text-primary);
     background: var(--gradient-primary);
     border: 1px solid rgba(48, 209, 88, 0.3);
-    box-shadow: 0 4px 20px rgba(48, 209, 88, 0.3);
+    box-shadow: 0 2px 10px rgba(48, 209, 88, 0.2); /* shadow reduzido */
 }
 
 .nav-link i {
     width: 24px;
     text-align: center;
     font-size: 1.1rem;
-    transition: transform 0.3s;
+    transition: transform 0.2s;
 }
 
 .nav-link:hover i {
-    transform: scale(1.1);
+    transform: scale(1.05);
 }
 
 .nav-link.active i {
@@ -322,23 +309,22 @@ body {
     align-items: center;
     justify-content: center;
     gap: 10px;
-    transition: all 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+    transition: all 0.2s ease;
     margin-top: 16px;
     font-size: 0.95rem;
     position: relative;
     overflow: hidden;
-    box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.2), inset 0 -2px 4px rgba(255, 69, 58, 0.1), 0 2px 8px rgba(255, 69, 58, 0.1);
+    box-shadow: 0 2px 8px rgba(255, 69, 58, 0.1);
 }
 
 .logout-btn:hover {
     background: rgba(255, 69, 58, 0.2);
-    transform: translateY(-2px);
-    box-shadow: inset 0 2px 6px rgba(255, 255, 255, 0.3), inset 0 -2px 4px rgba(255, 69, 58, 0.2), 0 6px 20px rgba(255, 69, 58, 0.2);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(255, 69, 58, 0.15);
 }
 
 .logout-btn:active {
     transform: scale(0.98);
-    box-shadow: inset 0 3px 8px rgba(0, 0, 0, 0.15), inset 0 -1px 2px rgba(255, 255, 255, 0.2);
 }
 
 /* Main Content */
@@ -387,14 +373,14 @@ body {
     font-weight: 600;
     font-size: 0.9rem;
     cursor: pointer;
-    backdrop-filter: blur(20px);
+    backdrop-filter: blur(10px);
     outline: none;
     appearance: none;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23fff' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: right 16px center;
     padding-right: 40px;
-    transition: all 0.3s;
+    transition: all 0.2s;
 }
 
 .ios-select:hover {
@@ -415,11 +401,11 @@ body {
     border: 1px solid var(--glass-border);
     border-radius: 24px;
     padding: 24px;
-    transition: all 0.4s cubic-bezier(0.32, 0.72, 0, 1);
+    transition: all 0.2s ease;
     position: relative;
     overflow: hidden;
     cursor: pointer;
-    box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.15), inset 0 -1px 2px rgba(0, 0, 0, 0.05), 0 4px 20px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
 }
 
 .stat-widget::before {
@@ -454,10 +440,10 @@ body {
 }
 
 .stat-widget:hover {
-    transform: translateY(-4px) scale(1.01);
+    transform: translateY(-2px) scale(1.005);
     background: var(--glass-bg-elevated);
     border-color: var(--glass-border-strong);
-    box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.25), inset 0 -2px 4px rgba(0, 0, 0, 0.08), 0 12px 40px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
 }
 
 .stat-header {
@@ -521,7 +507,7 @@ body {
 /* Content Sections */
 .content-section {
     display: none;
-    animation: fadeIn 0.5s cubic-bezier(0.32, 0.72, 0, 1);
+    animation: fadeIn 0.3s ease;
 }
 
 .content-section.active {
@@ -531,9 +517,8 @@ body {
 @keyframes fadeIn {
     from {
         opacity: 0;
-        transform: translateY(20px);
+        transform: translateY(10px);
     }
-
     to {
         opacity: 1;
         transform: translateY(0);
@@ -549,7 +534,7 @@ body {
     padding: 28px;
     margin-bottom: 24px;
     box-shadow: var(--glass-shadow);
-    transition: all 0.3s ease;
+    transition: all 0.2s ease;
 }
 
 .ios-panel:hover {
@@ -596,7 +581,7 @@ body {
     padding: 18px 16px;
     background: rgba(255, 255, 255, 0.03);
     border: none;
-    transition: all 0.3s;
+    transition: all 0.2s;
 }
 
 .ios-table tr:hover td {
@@ -631,7 +616,7 @@ body {
     border-radius: 12px;
     font-weight: 700;
     font-size: 0.9rem;
-    backdrop-filter: blur(10px);
+    backdrop-filter: blur(5px);
     border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
@@ -660,7 +645,7 @@ body {
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.03em;
-    backdrop-filter: blur(10px);
+    backdrop-filter: blur(5px);
 }
 
 .tag-aprovado {
@@ -704,11 +689,11 @@ body {
     background: rgba(255, 255, 255, 0.03);
     border-radius: 20px;
     border: 1px solid var(--glass-border);
-    transition: all 0.3s ease;
+    transition: all 0.2s ease;
 }
 
 .timeline-item:hover {
-    transform: translateX(8px);
+    transform: translateX(4px);
     background: var(--glass-bg-elevated);
     border-color: var(--glass-border-strong);
 }
@@ -723,7 +708,7 @@ body {
     background: var(--ios-accent-green);
     border-radius: 50%;
     border: 3px solid var(--ios-bg);
-    box-shadow: 0 0 0 3px var(--ios-accent-green);
+    box-shadow: 0 0 0 2px var(--ios-accent-green);
 }
 
 .timeline-date {
@@ -774,14 +759,14 @@ body {
     padding: 18px;
     margin-bottom: 12px;
     border-left: 4px solid var(--ios-accent-green);
-    transition: all 0.3s ease;
+    transition: all 0.2s ease;
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
 
 .aula-card:hover {
-    transform: translateX(6px);
+    transform: translateX(4px);
     background: var(--glass-bg-elevated);
 }
 
@@ -835,8 +820,8 @@ body {
     display: flex;
     gap: 12px;
     margin-bottom: 24px;
-    align-items: flex-start; /* children align at top so button doesn't stretch */
-    flex-wrap: wrap; /* allow wrapping when container grows */
+    align-items: flex-start;
+    flex-wrap: wrap;
 }
 
 .ios-input {
@@ -848,20 +833,20 @@ body {
     color: white;
     font-size: 1rem;
     outline: none;
-    transition: all 0.3s;
+    transition: all 0.2s;
     width: 100%;
 }
 
 .ios-input:focus {
     border-color: var(--ios-accent-green);
-    box-shadow: 0 0 0 4px rgba(48, 209, 88, 0.1);
+    box-shadow: 0 0 0 3px rgba(48, 209, 88, 0.1);
 }
 
 .ios-input::placeholder {
     color: var(--ios-text-secondary);
 }
 
-/* iOS Button com efeito Bolha */
+/* iOS Button com efeito Bolha (simplificado) */
 .ios-btn {
     padding: 16px 28px;
     background: var(--gradient-primary);
@@ -870,51 +855,35 @@ body {
     color: white;
     font-weight: 600;
     cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+    transition: all 0.2s ease;
     display: flex;
     align-items: center;
     gap: 8px;
     font-size: 0.95rem;
     position: relative;
     overflow: hidden;
-    box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.4), inset 0 -2px 4px rgba(0, 0, 0, 0.1), 0 4px 12px rgba(48, 209, 88, 0.2);
-}
-
-.ios-btn::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-    transition: left 0.6s;
+    box-shadow: 0 2px 8px rgba(48, 209, 88, 0.2);
 }
 
 .ios-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: inset 0 2px 6px rgba(255, 255, 255, 0.5), inset 0 -2px 4px rgba(0, 0, 0, 0.15), 0 8px 24px rgba(48, 209, 88, 0.3);
-}
-
-.ios-btn:hover::before {
-    left: 100%;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(48, 209, 88, 0.25);
 }
 
 .ios-btn:active {
     transform: scale(0.98);
-    box-shadow: inset 0 3px 8px rgba(0, 0, 0, 0.2), inset 0 -1px 2px rgba(255, 255, 255, 0.3);
 }
 
 .ios-btn.secondary {
     background: var(--glass-bg-elevated);
     border: 1px solid var(--glass-border);
     color: var(--ios-text-primary);
-    box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.15), inset 0 -2px 4px rgba(0, 0, 0, 0.05), 0 2px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
 
 .ios-btn.secondary:hover {
     background: var(--glass-bg-hover);
-    box-shadow: inset 0 2px 6px rgba(255, 255, 255, 0.25), inset 0 -2px 4px rgba(0, 0, 0, 0.08), 0 4px 12px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
 }
 
 .map-display {
@@ -950,7 +919,7 @@ body {
     padding: 24px;
     margin-top: 20px;
     display: none;
-    animation: slideUp 0.4s ease;
+    animation: slideUp 0.3s ease;
 }
 
 .room-result.show {
@@ -960,9 +929,8 @@ body {
 @keyframes slideUp {
     from {
         opacity: 0;
-        transform: translateY(20px);
+        transform: translateY(10px);
     }
-
     to {
         opacity: 1;
         transform: translateY(0);
@@ -1030,7 +998,7 @@ body {
     text-align: center;
     color: var(--ios-text-secondary);
     text-decoration: none;
-    transition: all 0.3s ease;
+    transition: all 0.2s ease;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -1040,7 +1008,7 @@ body {
 .quick-link:hover {
     background: var(--glass-bg-elevated);
     border-color: var(--glass-border-strong);
-    transform: translateY(-4px);
+    transform: translateY(-2px);
     color: var(--ios-text-primary);
 }
 
@@ -1113,13 +1081,13 @@ body {
     background: rgba(255, 255, 255, 0.03);
     border-radius: 16px;
     border: 1px solid var(--glass-border);
-    transition: all 0.3s ease;
+    transition: all 0.2s ease;
     max-width: 98%;
 }
 
 .info-row:hover {
     background: var(--glass-bg);
-    transform: translateX(4px);
+    transform: translateX(2px);
 }
 
 .info-label {
@@ -1146,9 +1114,9 @@ body {
     border-radius: 20px;
     text-align: center;
     cursor: pointer;
-    transition: all 0.4s cubic-bezier(0.32, 0.72, 0, 1);
+    transition: all 0.2s ease;
     border: 1px solid rgba(255, 255, 255, 0.2);
-    box-shadow: 0 4px 20px rgba(48, 209, 88, 0.3);
+    box-shadow: 0 2px 12px rgba(48, 209, 88, 0.2);
     position: relative;
     overflow: hidden;
 }
@@ -1159,7 +1127,7 @@ body {
     inset: 0;
     background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, transparent 100%);
     opacity: 0;
-    transition: opacity 0.3s;
+    transition: opacity 0.2s;
 }
 
 .periodo-card:hover::before {
@@ -1167,13 +1135,13 @@ body {
 }
 
 .periodo-card:hover {
-    transform: translateY(-6px) scale(1.05);
-    box-shadow: 0 15px 40px rgba(48, 209, 88, 0.4);
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 8px 25px rgba(48, 209, 88, 0.3);
 }
 
 .periodo-card.active {
     border-color: white;
-    box-shadow: 0 0 0 3px rgba(48, 209, 88, 0.3), 0 10px 40px rgba(48, 209, 88, 0.4);
+    box-shadow: 0 0 0 2px rgba(48, 209, 88, 0.3), 0 6px 25px rgba(48, 209, 88, 0.3);
 }
 
 .periodo-ano {
@@ -1199,11 +1167,11 @@ body {
     margin-bottom: 16px;
     border: 1px solid var(--glass-border);
     border-left: 4px solid var(--ios-accent-green);
-    transition: all 0.3s ease;
+    transition: all 0.2s ease;
 }
 
 .turma-item:hover {
-    transform: translateX(8px);
+    transform: translateX(4px);
     background: var(--glass-bg);
 }
 
@@ -1286,9 +1254,9 @@ body {
     bottom: 0;
     left: 0;
     right: 0;
-    background: rgba(10, 10, 15, 0.85);
-    backdrop-filter: blur(40px);
-    -webkit-backdrop-filter: blur(40px);
+    background: rgba(10, 10, 15, 0.9);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
     border-top: 1px solid var(--glass-border);
     padding: 12px 24px 32px;
     z-index: 9999;
@@ -1306,14 +1274,14 @@ body {
     color: var(--ios-text-secondary);
     text-decoration: none;
     border-radius: 16px;
-    transition: all 0.3s;
+    transition: all 0.2s;
     font-size: 0.7rem;
     font-weight: 600;
 }
 
 .mobile-menu-item i {
     font-size: 1.4rem;
-    transition: transform 0.3s;
+    transition: transform 0.2s;
 }
 
 .mobile-menu-item:hover,
@@ -1323,7 +1291,7 @@ body {
 }
 
 .mobile-menu-item.active i {
-    transform: translateY(-4px);
+    transform: translateY(-2px);
 }
 
 .menu-toggle {
@@ -1334,7 +1302,7 @@ body {
     width: 48px;
     height: 48px;
     background: var(--glass-bg);
-    backdrop-filter: blur(20px);
+    backdrop-filter: blur(10px);
     border: 1px solid var(--glass-border);
     border-radius: 14px;
     display: none;
@@ -1343,7 +1311,7 @@ body {
     color: white;
     font-size: 1.2rem;
     cursor: pointer;
-    transition: all 0.3s;
+    transition: all 0.2s;
     box-shadow: var(--glass-shadow);
 }
 
@@ -1356,7 +1324,7 @@ body {
     background: rgba(0, 0, 0, 0.5);
     z-index: 999;
     display: none;
-    backdrop-filter: blur(2px);
+    backdrop-filter: blur(1px);
 }
 
 .sidebar.open+.sidebar-overlay {
@@ -1371,17 +1339,16 @@ body {
     display: flex;
     align-items: center;
     gap: 14px;
-    backdrop-filter: blur(20px);
+    backdrop-filter: blur(10px);
     border: 1px solid;
-    animation: slideDown 0.4s ease;
+    animation: slideDown 0.3s ease;
 }
 
 @keyframes slideDown {
     from {
         opacity: 0;
-        transform: translateY(-20px);
+        transform: translateY(-10px);
     }
-
     to {
         opacity: 1;
         transform: translateY(0);
@@ -1400,7 +1367,7 @@ body {
     border-color: rgba(48, 209, 88, 0.2);
 }
 
-/* Mapa Spider-Man Style */
+/* Mapa Spider-Man Style (otimizado) */
 .map-spiderman-container {
     position: relative;
     width: 100%;
@@ -1410,7 +1377,7 @@ body {
     border-radius: 24px;
     overflow: hidden;
     border: 1px solid var(--glass-border);
-    box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.1), 0 20px 60px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
 }
 
 .map-content-wrapper {
@@ -1449,23 +1416,23 @@ body {
     position: absolute;
     cursor: pointer;
     transform-style: preserve-3d;
-    transition: all 0.4s cubic-bezier(0.32, 0.72, 0, 1);
+    transition: all 0.2s ease;
 }
 
 .building-3d:hover {
-    transform: translateY(-10px) scale(1.05);
+    transform: translateY(-5px) scale(1.02);
     z-index: 100;
 }
 
 .building-3d.active {
-    transform: translateY(-15px) scale(1.1);
+    transform: translateY(-8px) scale(1.05);
     z-index: 100;
 }
 
 .building-top {
     position: absolute;
     background: var(--glass-bg-elevated);
-    backdrop-filter: blur(10px);
+    backdrop-filter: blur(5px);
     border: 2px solid rgba(255, 255, 255, 0.3);
     border-radius: 8px;
     display: flex;
@@ -1474,14 +1441,14 @@ body {
     font-weight: 700;
     font-size: 0.9rem;
     color: white;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3), inset 0 1px 2px rgba(255, 255, 255, 0.3);
-    transition: all 0.3s;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    transition: all 0.2s;
 }
 
 .building-3d:hover .building-top {
     border-color: var(--ios-accent-green);
-    box-shadow: 0 0 20px rgba(48, 209, 88, 0.4), inset 0 1px 2px rgba(255, 255, 255, 0.5);
+    box-shadow: 0 0 10px rgba(48, 209, 88, 0.3);
 }
 
 .building-face {
@@ -1536,21 +1503,20 @@ body {
     left: 50%;
     transform: translateX(-50%);
     background: rgba(0, 0, 0, 0.8);
-    backdrop-filter: blur(10px);
+    backdrop-filter: blur(5px);
     padding: 6px 12px;
     border-radius: 8px;
     font-size: 0.75rem;
     font-weight: 600;
     white-space: nowrap;
     opacity: 0;
-    transition: all 0.3s;
+    transition: opacity 0.2s;
     pointer-events: none;
     border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .building-3d:hover .building-label {
     opacity: 1;
-    transform: translateX(-50%) translateY(-5px);
 }
 
 .map-info-panel {
@@ -1564,7 +1530,7 @@ body {
     border-radius: 20px;
     padding: 24px;
     transform: translateX(340px);
-    transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1);
+    transition: transform 0.3s ease;
     max-height: calc(100% - 40px);
     overflow-y: auto;
     z-index: 1000;
@@ -1602,7 +1568,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.3s;
+    transition: all 0.2s;
 }
 
 .close-panel:hover {
@@ -1622,13 +1588,13 @@ body {
     border-radius: 12px;
     padding: 16px;
     cursor: pointer;
-    transition: all 0.3s;
+    transition: all 0.2s;
 }
 
 .andar-item:hover {
     background: var(--glass-bg-elevated);
     border-color: var(--ios-accent-green);
-    transform: translateX(5px);
+    transform: translateX(3px);
 }
 
 .andar-numero {
@@ -1657,20 +1623,20 @@ body {
     height: 44px;
     border-radius: 12px;
     background: var(--glass-bg);
-    backdrop-filter: blur(10px);
+    backdrop-filter: blur(5px);
     border: 1px solid var(--glass-border);
     color: white;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    transition: all 0.3s;
+    transition: all 0.2s;
     font-size: 1.1rem;
 }
 
 .map-control-btn:hover {
     background: var(--glass-bg-elevated);
-    transform: translateY(-2px);
+    transform: translateY(-1px);
 }
 
 /* Responsividade */
@@ -1743,6 +1709,24 @@ body {
         height: 36px;
         font-size: 0.8rem;
     }
+
+    /* Otimizações extras para mobile */
+    .bubble {
+        filter: blur(10px); /* ainda mais reduzido */
+        opacity: 0.4;
+        animation: none; /* remove animação pesada em mobile */
+    }
+    .stat-widget {
+        backdrop-filter: none; /* remove blur em widgets no mobile para desempenho */
+        background: rgba(255, 255, 255, 0.1);
+    }
+    .ios-panel {
+        backdrop-filter: none;
+        background: rgba(255, 255, 255, 0.1);
+    }
+    .sidebar {
+        backdrop-filter: blur(15px); /* menos intenso */
+    }
 }
 
 /* Scrollbar iOS Style */
@@ -1767,7 +1751,6 @@ body {
 
 /* Touch Feedback */
 @media (hover: none) {
-
     .stat-widget:hover,
     .nav-link:hover,
     .turma-item:hover,
@@ -1793,8 +1776,7 @@ body {
     }
 }
 
-
-/* ==================== NOVOS ESTILOS ==================== */
+/* ==================== NOVOS ESTILOS (mantidos, com otimizações) ==================== */
 
 /* Painel de Informações do Mapa (Agora na parte inferior) */
 .map-info-panel-bottom {
@@ -1808,11 +1790,9 @@ body {
     border: 1px solid var(--glass-border-strong);
     border-radius: 28px;
     padding: 0;
-    /* Removido padding para o header controlar */
     box-shadow: var(--glass-shadow-elevated);
     transform: translateY(calc(100% + 30px));
-    /* Escondido por padrão */
-    transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1);
+    transition: transform 0.3s ease;
     z-index: 100;
     max-height: 70vh;
     display: flex;
@@ -1822,7 +1802,6 @@ body {
 
 .map-info-panel-bottom.open {
     transform: translateY(0);
-    /* Mostra quando ativo */
 }
 
 .info-panel-header-bottom {
@@ -1833,7 +1812,6 @@ body {
     background: rgba(0, 0, 0, 0.2);
     border-bottom: 1px solid var(--glass-border);
     cursor: pointer;
-    /* Indica que pode ser clicado para fechar */
 }
 
 .info-panel-title-bottom {
@@ -1852,7 +1830,6 @@ body {
     background: rgba(0, 0, 0, 0.1);
 }
 
-/* Ajuste para a lista de andares no novo painel */
 .info-panel-content-bottom .andar-list {
     display: flex;
     flex-direction: column;
@@ -1864,7 +1841,7 @@ body {
     border: 1px solid var(--glass-border);
     border-radius: 16px;
     padding: 18px;
-    transition: all 0.3s;
+    transition: all 0.2s;
 }
 
 .info-panel-content-bottom .andar-item:hover {
@@ -1873,26 +1850,23 @@ body {
 }
 
 /* Autocomplete para a busca de salas */
-/* o container já era relativo, mantemos para posicionamento de elementos internos */
 .autocomplete-container {
     position: relative;
     width: 100%;
+    z-index: 10000;
 }
 
-/* as sugestões agora participam do fluxo normal para que o painel pai aumente de altura
-   quando aparecem. Isso evita que as sugestões fiquem "embaixo" do mapa, já que o painel
-   de busca será redimensionado automaticamente. */
 .autocomplete-suggestions {
-    position: relative; /* não mais absoluto */
-    /* top/left/right removidos */
+    position: relative;
     background: var(--glass-bg-elevated);
     backdrop-filter: var(--liquid-blur-heavy);
+    -webkit-backdrop-filter: var(--liquid-blur-heavy);
     border: 1px solid var(--glass-border-strong);
-    border-radius: 16px;
+    border-radius: 24px;
     margin-top: 8px;
-    max-height: 300px;
+    max-height: 400px;
     overflow-y: auto;
-    z-index: 1000;
+    z-index: 10001;
     box-shadow: var(--glass-shadow-elevated);
     display: none;
 }
@@ -1959,7 +1933,6 @@ body {
     }
 }
 
-
 /* ==================== NOVOS ESTILOS PARA BUSCA OTIMIZADA ==================== */
 
 /* Container de resultados da pesquisa */
@@ -1973,7 +1946,7 @@ body {
     padding: 24px;
     box-shadow: var(--glass-shadow-elevated);
     display: none;
-    animation: slideUpFade 0.4s ease;
+    animation: slideUpFade 0.3s ease;
 }
 
 .search-result-container.show {
@@ -1983,9 +1956,8 @@ body {
 @keyframes slideUpFade {
     from {
         opacity: 0;
-        transform: translateY(20px);
+        transform: translateY(10px);
     }
-
     to {
         opacity: 1;
         transform: translateY(0);
@@ -2033,12 +2005,12 @@ body {
     display: flex;
     align-items: center;
     gap: 16px;
-    transition: all 0.3s ease;
+    transition: all 0.2s ease;
 }
 
 .result-detail-card:hover {
     background: var(--glass-bg-hover);
-    transform: translateY(-4px);
+    transform: translateY(-2px);
 }
 
 .result-detail-card i {
@@ -2102,7 +2074,7 @@ body {
 
 .keyword-tag:hover {
     background: rgba(48, 209, 88, 0.2);
-    transform: scale(1.05);
+    transform: scale(1.02);
 }
 
 .result-action-btn {
@@ -2142,7 +2114,7 @@ body {
 
 .suggestion-item:hover {
     background: var(--glass-bg-hover);
-    transform: translateX(8px);
+    transform: translateX(4px);
 }
 
 .suggestion-icon {
@@ -2265,7 +2237,7 @@ body {
 
 .andar-card:hover {
     background: var(--glass-bg);
-    transform: translateX(4px);
+    transform: translateX(2px);
 }
 
 .andar-header {
@@ -2304,7 +2276,7 @@ body {
 .sala-mini-card:hover {
     background: var(--glass-bg-hover);
     border-color: var(--ios-accent-green);
-    transform: translateY(-4px);
+    transform: translateY(-2px);
 }
 
 .sala-mini-card strong {
@@ -2320,21 +2292,19 @@ body {
 /* Highlight para blocos selecionados no mapa */
 .building-3d.highlight .building-top {
     border-color: var(--ios-accent-green);
-    box-shadow: 0 0 30px rgba(48, 209, 88, 0.8), inset 0 1px 4px rgba(255, 255, 255, 0.8);
+    box-shadow: 0 0 20px rgba(48, 209, 88, 0.5);
     animation: pulse 1.5s infinite;
 }
 
 @keyframes pulse {
     0% {
-        box-shadow: 0 0 20px rgba(48, 209, 88, 0.6);
+        box-shadow: 0 0 10px rgba(48, 209, 88, 0.4);
     }
-
     50% {
-        box-shadow: 0 0 40px rgba(48, 209, 88, 0.9);
+        box-shadow: 0 0 20px rgba(48, 209, 88, 0.7);
     }
-
     100% {
-        box-shadow: 0 0 20px rgba(48, 209, 88, 0.6);
+        box-shadow: 0 0 10px rgba(48, 209, 88, 0.4);
     }
 }
 
@@ -2413,9 +2383,6 @@ body {
     background: rgba(255, 255, 255, 0.3);
 }
 
-
-
-
 /* ==================== CORREÇÕES PARA AUTCOMPLETE ==================== */
 
 /* Garantir que o autocomplete fique sobre o mapa */
@@ -2423,14 +2390,10 @@ body {
     position: relative;
     width: 100%;
     z-index: 10000;
-    /* Aumentado drasticamente */
 }
 
-/* sobrescrevemos a posição absoluta em caso de regras repetidas mais abaixo; manteremos relativo
-   para que o painel de busca cresça com o conteúdo das sugestões */
 .autocomplete-suggestions {
     position: relative;
-    /* top/left/right removidos */
     background: var(--glass-bg-elevated);
     backdrop-filter: var(--liquid-blur-heavy);
     -webkit-backdrop-filter: var(--liquid-blur-heavy);
@@ -2440,7 +2403,6 @@ body {
     max-height: 400px;
     overflow-y: auto;
     z-index: 10001;
-    /* Maior que qualquer outro elemento quando necessário */
     box-shadow: var(--glass-shadow-elevated);
     display: none;
 }
@@ -2449,7 +2411,6 @@ body {
 .map-spiderman-container {
     position: relative;
     z-index: 1;
-    /* Baixo para não cobrir o autocomplete */
 }
 
 /* Ajuste para o painel de resultados não interferir */
@@ -2465,7 +2426,6 @@ body {
     }
 }
 
-
 .timeline-item {
     transition: transform 0.2s;
 }
@@ -2476,14 +2436,13 @@ body {
 }
 
 /* Toast */
-/* Toast */
 .toast {
     position: fixed;
     bottom: 30px;
     left: 50%;
     transform: translateX(-50%) translateY(100px);
     background: var(--glass-bg);
-    backdrop-filter: blur(20px);
+    backdrop-filter: blur(10px);
     border: 1px solid var(--glass-border);
     color: white;
     padding: 16px 24px;
@@ -2494,8 +2453,8 @@ body {
     align-items: center;
     gap: 12px;
     opacity: 0;
-    transition: all 0.3s ease;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+    transition: all 0.2s ease;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
 }
 
 .toast.show {
@@ -2518,7 +2477,7 @@ body {
     }
     
     .notification-btn span {
-        display: none; /* Só mostra ícone no mobile */
+        display: none;
     }
 }
 
@@ -2527,7 +2486,7 @@ body {
     background: var(--glass-bg);
     border: 1px solid var(--glass-border);
     color: var(--ios-text-primary);
-    transition: all 0.3s ease;
+    transition: all 0.2s ease;
 }
 
 #notification-btn:hover {
@@ -2547,11 +2506,6 @@ body {
 
 @keyframes bell-ring {
     0%, 100% { transform: rotate(0); }
-    10%, 30%, 50% { transform: rotate(10deg); }
-    20%, 40% { transform: rotate(-10deg); }
-}
-
-/* Remover o CSS antigo de botão flutuante se existir */
-.notification-btn {
-    /* delete isso se existir */
+    10%, 30%, 50% { transform: rotate(8deg); }
+    20%, 40% { transform: rotate(-8deg); }
 }
