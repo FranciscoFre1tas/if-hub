@@ -481,62 +481,106 @@ function parseHorario(codigo) {
   };
 }
 
-// Navegação
-function showSection(sectionName, event) {
-  document
-    .querySelectorAll(".nav-link")
-    .forEach((link) => link.classList.remove("active"));
-  if (event && event.currentTarget) {
-    event.currentTarget.classList.add("active");
-  } else {
-    const activeLink = Array.from(document.querySelectorAll(".nav-link")).find(
-      (link) =>
-        link.getAttribute("onclick") &&
-        link.getAttribute("onclick").includes(sectionName),
-    );
-    if (activeLink) activeLink.classList.add("active");
-  }
+// --- CONFIGURAÇÕES TÉCNICAS DO MENU ---
+const indicator = document.getElementById('navIndicator');
+const menuItems = document.querySelectorAll('.mobile-menu-item');
+let isHolding = false;
+let holdTimer;
 
-  document
-    .querySelectorAll(".mobile-menu-item")
-    .forEach((item) => item.classList.remove("active"));
-  const mobileItem = Array.from(
-    document.querySelectorAll(".mobile-menu-item"),
-  ).find(
-    (item) =>
-      item.getAttribute("onclick") &&
-      item.getAttribute("onclick").includes(sectionName),
-  );
-  if (mobileItem) mobileItem.classList.add("active");
-
-  document
-    .querySelectorAll(".content-section")
-    .forEach((s) => s.classList.remove("active"));
-
-  const targetSection = document.getElementById(`${sectionName}-section`);
-  if (targetSection) {
-    targetSection.classList.add("active");
-  }
-
-  const titles = {
-    dashboard: '<i class="fas fa-home"></i> Dashboard',
-    boletim: '<i class="fas fa-file-alt"></i> Boletim',
-    horarios: '<i class="fas fa-clock"></i> Horários',
-    turmas: '<i class="fas fa-users"></i> Turmas',
-    mapa: '<i class="fas fa-map-marked-alt"></i> Mapa do Campus',
-    avaliacoes: '<i class="fas fa-clipboard-list"></i> Avaliações',
-    periodos: '<i class="fas fa-calendar-alt"></i> Períodos',
-    perfil: '<i class="fas fa-user"></i> Perfil',
-  };
-  const pageTitle = document.getElementById("page-title");
-  if (pageTitle) {
-    pageTitle.innerHTML = titles[sectionName] || titles["dashboard"];
-  }
-
-  if (window.innerWidth <= 1024) {
-    closeSidebar();
-  }
+// Função para mover a bolha
+function updateIndicator(el) {
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    const menuRect = el.parentElement.getBoundingClientRect();
+    
+    // Calcula o centro do item para alinhar a bolha
+    const left = rect.left - menuRect.left;
+    
+    indicator.style.width = `${rect.width}px`;
+    // Usamos apenas o X. O Scale agora é controlado pela classe .holding no CSS
+    indicator.style.transform = `translateX(${left}px)`;
 }
+
+// Inicializa no carregamento
+window.addEventListener('load', () => {
+    const activeItem = document.querySelector('.mobile-menu-item.active');
+    if (activeItem) updateIndicator(activeItem);
+});
+
+// --- FUNÇÃO DE NAVEGAÇÃO COMPLETA (Original + Efeito) ---
+function showSection(sectionName, event) {
+    // 1. Menu Mobile (bolha)
+    menuItems.forEach((item) => item.classList.remove("active"));
+    
+    let activeItem;
+    if (event && event.currentTarget) {
+        activeItem = event.currentTarget;
+    } else {
+        // Encontra o item pelo nome da seção se vier do drag
+        activeItem = Array.from(menuItems).find(item => 
+            item.getAttribute("onclick") && item.getAttribute("onclick").includes(sectionName)
+        );
+    }
+
+    if (activeItem) {
+        activeItem.classList.add("active");
+        updateIndicator(activeItem); // Move a bolha
+    }
+
+    // 2. Troca de Seções e Títulos (Sua lógica original)
+    document.querySelectorAll(".content-section").forEach((s) => s.classList.remove("active"));
+    const targetSection = document.getElementById(`${sectionName}-section`);
+    if (targetSection) targetSection.classList.add("active");
+
+    const titles = {
+        dashboard: '<i class="fas fa-home"></i> Dashboard',
+        boletim: '<i class="fas fa-file-alt"></i> Boletim',
+        horarios: '<i class="fas fa-clock"></i> Horários',
+        turmas: '<i class="fas fa-users"></i> Turmas',
+        mapa: '<i class="fas fa-map-marked-alt"></i> Mapa do Campus',
+        avaliacoes: '<i class="fas fa-clipboard-list"></i> Avaliações',
+        periodos: '<i class="fas fa-calendar-alt"></i> Períodos',
+        perfil: '<i class="fas fa-user"></i> Perfil',
+    };
+    const pageTitle = document.getElementById("page-title");
+    if (pageTitle) pageTitle.innerHTML = titles[sectionName] || titles["dashboard"];
+}
+
+// --- LÓGICA DE GESTO "HOLD & DRAG" (Refinado) ---
+menuItems.forEach(item => {
+    item.addEventListener('touchstart', (e) => {
+        // Tempo ligeiramente maior para considerar o segurar (350ms)
+        holdTimer = setTimeout(() => {
+            isHolding = true;
+            indicator.classList.add('holding'); // Bolha infla e ganha refração
+            if (navigator.vibrate) navigator.vibrate([15]); // Vibração rápida
+        }, 350); 
+    });
+
+    item.addEventListener('touchend', () => {
+        clearTimeout(holdTimer);
+        isHolding = false;
+        indicator.classList.remove('holding'); // Bolha volta ao normal
+    });
+
+    item.addEventListener('touchmove', (e) => {
+        if (isHolding) {
+            const touch = e.touches[0];
+            // Detecta onde o dedo está passando
+            const targetEl = document.elementFromPoint(touch.clientX, touch.clientY);
+            const menuBtn = targetEl?.closest('.mobile-menu-item');
+
+            if (menuBtn && !menuBtn.classList.contains('active')) {
+                // Extrai o nome da seção do atributo onclick
+                const onclickAttr = menuBtn.getAttribute('onclick');
+                const section = onclickAttr.match(/'([^']+)'/)[1];
+                
+                showSection(section); // Muda a seção
+                if (navigator.vibrate) navigator.vibrate(8); // Vibração suave de "passagem"
+            }
+        }
+    }, { passive: true });
+});
 
 function toggleSidebar() {
   const sidebar = document.getElementById("sidebar");
