@@ -493,12 +493,14 @@ function updateIndicator(el) {
     const rect = el.getBoundingClientRect();
     const menuRect = el.parentElement.getBoundingClientRect();
     
-    // Calcula o centro do item para alinhar a bolha
+    // Calcula a posição X
     const left = rect.left - menuRect.left;
     
+    // 1. Atualiza a largura
     indicator.style.width = `${rect.width}px`;
-    // Usamos apenas o X. O Scale agora é controlado pela classe .holding no CSS
-    indicator.style.transform = `translateX(${left}px)`;
+    
+    // 2. O SEGREDO: Em vez de style.transform, mudamos a Variável CSS
+    indicator.style.setProperty('--x', `${left}px`);
 }
 
 // Inicializa no carregamento

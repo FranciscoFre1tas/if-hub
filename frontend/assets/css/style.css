@@ -284,7 +284,6 @@ body {
     isolation: isolate;
     box-shadow: 0px 6px 24px rgba(0, 0, 0, 0.2);
     background: none;
-    cursor: pointer;
     overflow: hidden;
 }
 
@@ -367,6 +366,7 @@ body {
   cursor: pointer;
   overflow: hidden;
   border: var(--glass-border) solid 1px;
+  transition: all 0.3s ease;
 }
 
 .stat-widget::before {
@@ -397,6 +397,7 @@ body {
     border-color: var(--glass-border-strong);
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
     overflow: hidden;
+    transition: all 0.3s ease;
 }
 
 .stat-header {
@@ -416,6 +417,16 @@ body {
     font-size: 1.3rem;
     background: var(--gradient-primary);
 }
+.stat-widget.situacao{
+    cursor: default;
+}
+.stat-widget.curso{
+    cursor: default;
+}
+.stat-widget.ingresso{
+    cursor: default;
+}
+
 
 .stat-widget.ira .stat-icon {
     background: var(--gradient-blue);
@@ -1256,6 +1267,10 @@ body {
     left: 0;
     height: calc(100% - 16px);
     width: 60px; /* Largura inicial */
+    /* O SEGREDO: Usamos uma variável para a posição */
+    /* E garantimos que o scale(1) esteja aqui para o navegador saber o centro */
+    transform: translateX(var(--x, 0)) scale(1);
+    transform-origin: center center;
     
     /* EFEITO DE REFRAÇÃO (VIDRO) */
     background: var(--indicator-light);
@@ -1281,8 +1296,8 @@ body {
 
 /* ESTADO "BOBOLHA" (QUANDO ESTÁ SEGURANDO) */
 .nav-indicator.holding {
-    height: 80px; /* Aumenta de tamanho de forma dramática */
-    margin-top: -10px;
+    /* Mantemos a posição X e aplicamos o scale no mesmo lugar */
+    transform: translateX(var(--x, 0)) scale(1.3);
     
     /* INTENSIFICA O EFEITO DE REFRAÇÃO */
     backdrop-filter: blur(30px) saturate(250%);
@@ -1324,6 +1339,20 @@ body {
 
 .mobile-menu-item.active i {
     color: var(--ios-accent-green); /* Ícone com a cor de destaque */
+}
+
+/* Esconde a dock em telas grandes */
+@media (min-width: 1025px) {
+    .mobile-menu {
+        display: none !important;
+    }
+}
+
+/* Garante que ela apareça APENAS em telas menores */
+@media (max-width: 1024px) {
+    .mobile-menu {
+        display: flex; /* Lembra que mudamos para flex para a bolha funcionar? */
+    }
 }
 
 .menu-toggle {
@@ -2525,4 +2554,30 @@ body {
     0%, 100% { transform: rotate(0); }
     10%, 30%, 50% { transform: rotate(8deg); }
     20%, 40% { transform: rotate(-8deg); }
+}
+
+/* REMOVER FUNÇÕES DE NAVEGADOR SÓ PRO MOBILE*/
+
+/* Mobile: botão menor */
+@media (max-width: 768px) {
+    /* Bloqueia a seleção de texto em todo o app (menos em inputs) */
+* {
+    -webkit-user-select: none;  /* Safari/iOS */
+    -ms-user-select: none;      /* IE/Edge */
+    user-select: none;          /* Padrão */
+    -webkit-touch-callout: none; /* BLOQUEIA o menu de segurar (iOS) */
+    -webkit-tap-highlight-color: transparent; /* Remove o flash azul ao tocar */
+}
+
+/* Permite seleção apenas onde é necessário (ex: inputs de login) */
+input, textarea {
+    -webkit-user-select: text;
+    user-select: text;
+}
+
+/* Bloqueia o arrastar de imagens (que gera aquele link chato) */
+img {
+    -webkit-user-drag: none;
+    user-drag: none;
+}
 }
