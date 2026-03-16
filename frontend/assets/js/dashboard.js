@@ -1393,6 +1393,25 @@ function updateNotificationUI(isActive) {
   }
 }
 
+// Verifica se a tela é menor ou igual a 1024px (celulares e tablets)
+if (window.innerWidth <= 1024) {
+    
+    // 1. Desativa o menu de contexto (clique longo no celular)
+    window.addEventListener('contextmenu', function (e) {
+        e.preventDefault();
+    }, false);
+
+    // 2. Proteção para imagens
+    // Bloqueia mousedown (PC simulando mobile) e dragstart (arraste nativo)
+    document.querySelectorAll('img').forEach(img => {
+        // Evita que a imagem seja "puxada"
+        img.addEventListener('dragstart', e => e.preventDefault());
+        // Evita o menu ao segurar em navegadores que não respeitam o contextmenu
+        img.addEventListener('mousedown', e => e.preventDefault());
+    });
+}
+
+
 // ========== INICIALIZAÇÃO ==========
 document.addEventListener("DOMContentLoaded", async function () {
   console.log("🚀 Inicializando aplicação...");
