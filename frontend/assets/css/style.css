@@ -680,19 +680,6 @@ body {
     border-color: var(--glass-border-strong);
 }
 
-.timeline-item::before {
-    content: '';
-    position: absolute;
-    left: -28px;
-    top: 28px;
-    width: 14px;
-    height: 14px;
-    background: var(--ios-accent-green);
-    border-radius: 50%;
-    border: 3px solid var(--ios-bg);
-    box-shadow: 0 0 0 2px var(--ios-accent-green);
-}
-
 .timeline-date {
     font-size: 0.875rem;
     color: var(--ios-accent-green);

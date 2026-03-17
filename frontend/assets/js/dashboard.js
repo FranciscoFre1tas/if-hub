@@ -856,9 +856,9 @@ function preencherDashboard(data) {
         .map(
           (av) => `
                 <div class="timeline-item" style="margin-bottom: 16px;">
-                    <div class="timeline-date"><i class="fas fa-clock"></i> ${formatarData(av.data)} às ${av.hora_inicio || "--:--"}</div>
+                    <div class="timeline-date"><i class="fas fa-clock"></i> ${formatarData(av.data)}</div>
                     <div class="timeline-title">${av.descricao || "Avaliação"}</div>
-                    <div class="timeline-desc">${av.componente_curricular || ""}</div>
+                    <div class="timeline-desc">${av.diario || av.componente_curricular || ""}</div>
                 </div>
             `,
         )
