@@ -35,63 +35,62 @@ async function carregarDadosMapa() {
     }));
 
     // --- Construir buildingData combinando blocos do JSON com os blocos personalizados ---
-    // Blocos personalizados que já existem no mapa 3D (Guarita, Cantina, etc.)
-const blocosPersonalizados = {
-  1: {
-    nome: "Guarita",
-    descricao: "Entrada principal",
-    andares: { Térreo: ["Portaria"] },
-    icon: "shield-alt",
-    cor: "var(--ios-accent-blue)",
-  },
-  4: {
-    nome: "Espaço Multiuso",
-    descricao: "Atividades diversas",
-    andares: { Térreo: ["Ginástica", "Eventos", "Aulas"] },
-    icon: "table-tennis",
-    cor: "var(--ios-accent-orange)",
-  },
-  6: {
-    nome: "Piscina",
-    descricao: "Natação",
-    andares: { Externo: ["Piscina"] },
-    icon: "swimming-pool",
-    cor: "var(--ios-accent-blue)",
-  },
-  areia: {
-    nome: "Quadra de Areia",
-    descricao: "Esportes de praia",
-    andares: { Externo: ["Vôlei de Praia", "Futevôlei"] },
-    icon: "volleyball-ball",
-    cor: "var(--ios-accent-orange)",
-  },
-  quadra: {
-    nome: "Quadra Poliesportiva",
-    descricao: "Esportes",
-    andares: { Externo: ["Basquete", "Futsal", "Handebol", "Banho"] },
-    icon: "basketball-ball",
-    cor: "var(--ios-accent-orange)",
-  },
-  "E-ginasio": {
-    nome: "Ginásio",
-    descricao: "Educação Física",
-    andares: {
-      Térreo: ["Quadra", "Academia", "Vestiários Masculino", "Vestiários Feminino"]
-    },
-    icon: "dumbbell",
-    cor: "#FF3B30",
-  },
-  "E-anexo": {
-    nome: "Prédio Anexo - Música e Arte",
-    descricao: "Laboratórios de Música e Arte",
-    andares: {
-      "1º Andar": ["Lab. de Música", "Sala de Música"],
-      "2º Andar": ["Coord. NUARTE", "Lab. Cenográfico", "Grêmio"]
-    },
-    icon: "music",
-    cor: "#FF3B30",
-  },
-};
+    const blocosPersonalizados = {
+      1: {
+        nome: "Guarita",
+        descricao: "Entrada principal",
+        andares: { Térreo: ["Portaria"] },
+        icon: "shield-alt",
+        cor: "var(--ios-accent-blue)",
+      },
+      4: {
+        nome: "Espaço Multiuso",
+        descricao: "Atividades diversas",
+        andares: { Térreo: ["Ginástica", "Eventos", "Aulas"] },
+        icon: "table-tennis",
+        cor: "var(--ios-accent-orange)",
+      },
+      6: {
+        nome: "Piscina",
+        descricao: "Natação",
+        andares: { Externo: ["Piscina"] },
+        icon: "swimming-pool",
+        cor: "var(--ios-accent-blue)",
+      },
+      areia: {
+        nome: "Quadra de Areia",
+        descricao: "Esportes de praia",
+        andares: { Externo: ["Vôlei de Praia", "Futevôlei"] },
+        icon: "volleyball-ball",
+        cor: "var(--ios-accent-orange)",
+      },
+      quadra: {
+        nome: "Quadra Poliesportiva",
+        descricao: "Esportes",
+        andares: { Externo: ["Basquete", "Futsal", "Handebol", "Banho"] },
+        icon: "basketball-ball",
+        cor: "var(--ios-accent-orange)",
+      },
+      "E-ginasio": {
+        nome: "Ginásio",
+        descricao: "Educação Física",
+        andares: {
+          Térreo: ["Quadra", "Academia", "Vestiários Masculino", "Vestiários Feminino"]
+        },
+        icon: "dumbbell",
+        cor: "#FF3B30",
+      },
+      "E-anexo": {
+        nome: "Prédio Anexo - Música e Arte",
+        descricao: "Laboratórios de Música e Arte",
+        andares: {
+          "1º Andar": ["Lab. de Música", "Sala de Música"],
+          "2º Andar": ["Coord. NUARTE", "Lab. Cenográfico", "Grêmio"]
+        },
+        icon: "music",
+        cor: "#FF3B30",
+      },
+    };
 
     // Blocos do JSON (A, B, C, D, E, F)
     const blocosJSON = {};
@@ -421,6 +420,23 @@ function resetMap() {
   document.getElementById("autocomplete-suggestions").classList.remove("show");
 }
 
+// Filtrar por categoria (chamado pelos quick links)
+function filterByCategory(category) {
+  const searchInput = document.getElementById("room-search");
+  if (!searchInput) return;
+  
+  // Mapeia categorias para termos de busca
+  const categoryMap = {
+    'lab': 'laboratório',
+    'biblioteca': 'biblioteca',
+    'esporte': 'quadra ginásio',
+    'alimentacao': 'cantina refeitório'
+  };
+  
+  searchInput.value = categoryMap[category] || category;
+  performSmartSearch();
+}
+
 // Utilitários
 function escapeHtml(text) {
   const div = document.createElement("div");
@@ -442,7 +458,7 @@ function escapeRegExp(string) {
   return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
-// ========== FUNÇÕES ORIGINAIS (mantidas) ==========
+// ========== FUNÇÕES ORIGINAIS ==========
 
 function safeArray(data) {
   if (!data) return [];
@@ -511,11 +527,16 @@ window.addEventListener('load', () => {
 
 // --- FUNÇÃO DE NAVEGAÇÃO COMPLETA (Original + Efeito) ---
 function showSection(sectionName, event) {
-    // 1. Menu Mobile (bolha)
+    // 1. Previne comportamento padrão se for chamado por evento
+    if (event) {
+        event.preventDefault();
+    }
+
+    // 2. Menu Mobile (bolha)
     menuItems.forEach((item) => item.classList.remove("active"));
     
     let activeItem;
-    if (event && event.currentTarget) {
+    if (event && event.currentTarget && event.currentTarget.classList.contains('mobile-menu-item')) {
         activeItem = event.currentTarget;
     } else {
         // Encontra o item pelo nome da seção se vier do drag
@@ -529,7 +550,23 @@ function showSection(sectionName, event) {
         updateIndicator(activeItem); // Move a bolha
     }
 
-    // 2. Troca de Seções e Títulos (Sua lógica original)
+    // 3. Atualiza sidebar (links principais)
+    document.querySelectorAll(".sidebar .nav-link").forEach(link => link.classList.remove("active"));
+    const sidebarLink = Array.from(document.querySelectorAll(".sidebar .nav-link")).find(link => {
+        const onclick = link.getAttribute("onclick");
+        return onclick && onclick.includes(sectionName);
+    });
+    if (sidebarLink) sidebarLink.classList.add("active");
+
+    // 4. Atualiza header-nav
+    document.querySelectorAll(".header-nav-link").forEach(link => link.classList.remove("active"));
+    const headerLink = Array.from(document.querySelectorAll(".header-nav-link")).find(link => {
+        const onclick = link.getAttribute("onclick");
+        return onclick && onclick.includes(sectionName);
+    });
+    if (headerLink) headerLink.classList.add("active");
+
+    // 5. Troca de Seções e Títulos (Sua lógica original)
     document.querySelectorAll(".content-section").forEach((s) => s.classList.remove("active"));
     const targetSection = document.getElementById(`${sectionName}-section`);
     if (targetSection) targetSection.classList.add("active");
@@ -546,6 +583,11 @@ function showSection(sectionName, event) {
     };
     const pageTitle = document.getElementById("page-title");
     if (pageTitle) pageTitle.innerHTML = titles[sectionName] || titles["dashboard"];
+
+    // Fecha sidebar no mobile se estiver aberta
+    if (window.innerWidth <= 1024) {
+        closeSidebar();
+    }
 }
 
 // --- LÓGICA DE GESTO "HOLD & DRAG" (Refinado) ---
@@ -583,6 +625,14 @@ menuItems.forEach(item => {
         }
     }, { passive: true });
 });
+
+// --- Função para toggle da sidebar no desktop ---
+function toggleSidebarDesktop() {
+    const sidebar = document.getElementById("sidebar");
+    const mainContent = document.getElementById("mainContent");
+    sidebar.classList.toggle("sidebar-collapsed");
+    mainContent.classList.toggle("expanded");
+}
 
 function toggleSidebar() {
   const sidebar = document.getElementById("sidebar");
@@ -755,40 +805,40 @@ function preencherSidebar(data) {
 
 function preencherDashboard(data) {
   const aluno = safeObject(data.aluno);
+  const boletim = safeArray(data.boletim);
 
   const cardIra = document.getElementById("card-ira");
-  const cardSituacao = document.getElementById("card-situacao");
-  const cardCurso = document.getElementById("card-curso");
-  const cardIngresso = document.getElementById("card-ingresso");
+  const cardFrequencia = document.getElementById("card-frequencia");
   const cardFaltas = document.getElementById("card-faltas");
-  const cardDisciplinas = document.getElementById("card-disciplinas");
 
   if (cardIra) cardIra.textContent = aluno.ira || "--";
-  if (cardSituacao) cardSituacao.textContent = aluno.situacao || "--";
-  if (cardCurso)
-    cardCurso.textContent =
-      (aluno.curso || "").split(" - ")[1] || aluno.curso || "--";
-  if (cardIngresso) cardIngresso.textContent = aluno.ingresso || "--";
 
-  const boletim = safeArray(data.boletim);
-  const totalFaltas = boletim.reduce(
-    (sum, d) => sum + (parseInt(d.numero_faltas) || 0),
-    0,
-  );
+  // Frequência - Média das porcentagens de frequência
+  if (cardFrequencia) {
+    let totalFreq = 0;
+    let count = 0;
+    boletim.forEach(d => {
+      const freq = parseFloat(d.percentual_carga_horaria_frequentada);
+      if (!isNaN(freq)) {
+        totalFreq += freq;
+        count++;
+      }
+    });
+    const mediaFreq = count > 0 ? (totalFreq / count).toFixed(1) + '%' : '--';
+    cardFrequencia.textContent = mediaFreq;
+  }
 
-  if (cardFaltas) cardFaltas.textContent = totalFaltas;
-  if (cardDisciplinas) cardDisciplinas.textContent = boletim.length;
+  // Total de Faltas
+  if (cardFaltas) {
+    const totalFaltas = boletim.reduce((sum, d) => sum + (parseInt(d.numero_faltas) || 0), 0);
+    cardFaltas.textContent = totalFaltas;
+  }
 
   const containerAval = document.getElementById("dashboard-avaliacoes");
 
-  console.log("DEBUG AVALIAÇÕES:", data.avaliacoes);
-
   let avaliacoes = [];
-
   if (data.avaliacoes) {
     const proximas = safeArray(data.avaliacoes.proximas);
-    
-
     avaliacoes = proximas;
   }
 
@@ -846,6 +896,95 @@ function preencherDashboard(data) {
       containerBoletim.innerHTML = html;
     }
   }
+
+  // Preenche horários de hoje
+  preencherHorariosHoje(data);
+}
+
+// NOVA FUNÇÃO: Preencher o painel de horários de hoje
+function preencherHorariosHoje(data) {
+  const container = document.getElementById("dashboard-horarios-hoje");
+  if (!container) return;
+
+  const hoje = new Date();
+  const diaSemana = hoje.getDay(); // 0 = domingo, 1 = segunda, ..., 6 = sábado
+
+  // Se for sábado ou domingo, exibir mensagem
+  if (diaSemana === 0) { // domingo
+    container.innerHTML = `
+      <div class="empty-state" style="padding: 20px;">
+        <i class="fas fa-sun" style="font-size: 2.5rem;"></i>
+        <p style="font-size: 1.1rem; margin: 10px 0;">Domingo é dia de descanso! 🛌</p>
+        <small style="color: var(--ios-text-secondary);">Amanhã (segunda) você tem aulas normalmente.</small>
+      </div>
+    `;
+    return;
+  }
+  if (diaSemana === 6) { // sábado
+    container.innerHTML = `
+      <div class="empty-state" style="padding: 20px;">
+        <i class="fas fa-couch" style="font-size: 2.5rem;"></i>
+        <p style="font-size: 1.1rem; margin: 10px 0;">Sábado, dia de relaxar! 🎉</p>
+        <small style="color: var(--ios-text-secondary);">Aproveite o fim de semana.</small>
+      </div>
+    `;
+    return;
+  }
+
+  // Dia de semana (segunda a sexta)
+  const turmas = safeArray(data.turmas);
+  const horariosHoje = [];
+
+  turmas.forEach(turma => {
+    if (turma.horarios_de_aula) {
+      const codigos = turma.horarios_de_aula.split(" / ");
+      codigos.forEach(cod => {
+        const parsed = parseHorario(cod.trim());
+        // parsed.dia: 1=domingo,2=segunda,...7=sábado
+        if (parsed && parsed.dia === diaSemana + 1) { // +1 porque no array o índice 1 é domingo
+          horariosHoje.push({
+            ...parsed,
+            disciplina: turma.descricao,
+            sigla: turma.sigla,
+            local: turma.locais_de_aula?.[0] || "Local não definido",
+          });
+        }
+      });
+    }
+  });
+
+  if (horariosHoje.length === 0) {
+    container.innerHTML = `
+      <div class="empty-state" style="padding: 20px;">
+        <i class="fas fa-calendar-day"></i>
+        <p>Nenhuma aula hoje</p>
+      </div>
+    `;
+    return;
+  }
+
+  // Ordenar por turno e hora
+  const ordemTurno = { M: 1, V: 2, N: 3 };
+  horariosHoje.sort((a, b) => {
+    if (ordemTurno[a.turno] !== ordemTurno[b.turno]) return ordemTurno[a.turno] - ordemTurno[b.turno];
+    return a.horas[0] - b.horas[0];
+  });
+
+  let html = '<div style="display: flex; flex-direction: column; gap: 12px;">';
+  horariosHoje.forEach(aula => {
+    const tagClass = { M: "tag-manha", V: "tag-tarde", N: "tag-noite" }[aula.turno] || "tag-manha";
+    html += `
+      <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.03); padding: 16px; border-radius: 16px; border-left: 4px solid var(--ios-accent-green);">
+        <div>
+          <div style="font-weight: 600; margin-bottom: 4px;">${aula.disciplina}</div>
+          <div style="font-size: 0.85rem; color: var(--ios-text-secondary);"><i class="fas fa-map-marker-alt"></i> ${aula.local}</div>
+        </div>
+        <span class="aula-tag ${tagClass}" style="font-size: 0.7rem;">${aula.turnoNome} (${aula.horasStr})</span>
+      </div>
+    `;
+  });
+  html += '</div>';
+  container.innerHTML = html;
 }
 
 function preencherPerfil(data) {
@@ -1440,8 +1579,10 @@ document.addEventListener("DOMContentLoaded", async function () {
   window.trocarAno = trocarAno;
   window.initNotifications = initNotifications;
   window.unsubscribeNotifications = unsubscribeNotifications;
-  window.clearSearch = clearSearch;         // importante para o botão de limpar
+  window.clearSearch = clearSearch;
   window.closeResultPanel = closeResultPanel;
+  window.filterByCategory = filterByCategory;
+  window.toggleSidebarDesktop = toggleSidebarDesktop; // nova função
 
   console.log("✅ Sistema pronto!");
 });
