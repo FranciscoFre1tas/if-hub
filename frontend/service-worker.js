@@ -1,4 +1,4 @@
-const CACHE_NAME = 'if-smart-v19';
+const CACHE_NAME = 'if-smart-v20';
 
 const urlsToCache = [
   '/',
